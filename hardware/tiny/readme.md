@@ -15,4 +15,14 @@ Mounting holes match those of the Forty9er PCB board.
 The reference PCB can be made at home. 
 I use a mini-router but chemical etching should work as well.
 ![wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/tiny/1109191128.jpg)
-All gerber files and EasyEDA schematics and boards are in the repository.
+Note that the traces in this implemenation are all on the top side of the board so
+you may need to flip images if using transfer/chemical etching techniques.
+
+Disclaimer: I am not affiliated with nor make any income from easyEDA or their PCB fab house.
+
+The tiny radio (aka "easyVFO") project is shared on easyEDA web site. 
+If you don't want to make your own board, all files can be found there
+and PCBs can be ordered from that site. 
+10x PCBs with shipping will cost about $18 USD so share them with your friends and club.
+https://easyeda.com/taycheel/easyvfo
+
