@@ -44,3 +44,4 @@ Tiny radio -
 Not so tiny radio -
 ![wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/TRV2RC5.png)
 
+All supported by the same software without recompilation.
