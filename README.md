@@ -8,7 +8,7 @@ On the other hand, all code is provided so that those inclined to can modify it 
 
 Features:
 - One or two clock sources for either a direction conversion or superheterodyne radio by controlling an si5351.
-- **USB, LSB, CQ, AM and digital modes.** Automatic IF shifting as required.
+- **USB, LSB, CW, AM and digital modes.** Automatic IF shifting as required.
 - selection of up to 4 IF filters with user defined center frequencies, band widths and IF shifts.
 - selection of up to 8 bandpass filters.
 - selection of up to 8 lowpass filters.
