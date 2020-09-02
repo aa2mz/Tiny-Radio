@@ -12,7 +12,7 @@ On the other hand, all code is provided so that those inclined to can modify it 
 - selection of up to 4 IF filters with user defined center frequencies, band widths and IF shifts.
 - selection of up to 8 bandpass filters.
 - selection of up to 8 lowpass filters.
-- **analog inputs for S-Meter and TX forward and reverse power.^^
+- **analog inputs for S-Meter and TX forward and reverse power.**
 - **keyer support** with straigh key, semi-automatic and automatic paddle modes. 
 - sidetone support with variable pitch
 - variable CW speed, weight, and "Farnsworth" support.
