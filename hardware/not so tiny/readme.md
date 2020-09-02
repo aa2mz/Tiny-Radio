@@ -54,7 +54,11 @@ Search eBay for "Project Box 200x175x70mm"
 
 ![schema](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/Sheet_1.png)
 
-Using both relays will exceed the maximum suggested operating current of the Arduino Nano pin. 
-It will probably work but next rev will include addional circuitry to switch the relays.
+Notes page 1 -
+- Using both relays will exceed the maximum suggested operating current of a single Arduino Nano pin. 
+Switching one relay is in spec and switching two will probably work.
+The next rev should include addional circuitry to switch the relays.
 
 ![schema](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/Sheet_2.png)
+
+Notes page 1 - Electret mic input probably doesn't need an amplfier prior to use by an IC mixer. The ne602/sa612 requires that the input be in the micro volt range. Adjust the values of ISR1 and ISR2 to get the voltage levels of the line-in and microphone down to at most  63 millivolts PP at 50 ohms or 350mV PP at 1500 ohms for use by an ne602/sa612.
