@@ -1,12 +1,12 @@
 # Tiny-Radio
 Tiny Radio Software 
 
-Purpose:
+## Purpose:
 Feature rich digital VFO software is provied that can be configured "at run time"
 so that people can use it for their own ham radio projects without needing to know how to program.
 On the other hand, all code is provided so that those inclined to can modify it for their own purposes.
 
-Features:
+## Features:
 - One or two clock sources for either a direction conversion or superheterodyne radio by controlling an si5351.
 - **USB, LSB, CW, AM and digital modes.** Automatic IF shifting as required.
 - selection of up to 4 IF filters with user defined center frequencies, band widths and IF shifts.
@@ -25,10 +25,12 @@ However, not all features are available at once due to the limited number of pin
 For example, having the Nano generate a CW sidetone will reduce the LPFs from 8 to 4.
 All pin definition are in one file if you do have to make larger changes than that.
 
-Tiny Radio Hardware
+## Tiny Radio Hardware Requirements
 
 A minimum configuration for the Tiny Radio is an Arduino Nano board and an si5351 breakout board
 (such as available from Adafruit or eBay.) 
 That's enough to get a basic radio such as a Forty9'er or a simple receiver going. 
-Three hardware "reference designs" are included with this project.
+Many additional features support more complex radios and can be selected depending on the user's needs.
+Three hardware "reference designs" are included with this project varying from the mimimalist implementation
+to that of a classical amatuer HF radio.
 Applicable schematics, gerber files and BOMs are included in this repository.
