@@ -1,5 +1,5 @@
 # Tiny-Radio
-Tiny Radio Software 
+Radio Software for high frequency electronics
 
 ## Purpose:
 Feature rich digital VFO software is provied that can be configured "at run time"
@@ -34,3 +34,13 @@ Many additional features support more complex radios and can be selected dependi
 Three hardware "reference designs" are included with this project varying from the mimimalist implementation
 to that of a classical amatuer HF radio.
 Applicable schematics, gerber files and BOMs are included in this repository.
+
+Very tiny radio -
+![Wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/very%20tiny/0905191316.jpg)
+
+Tiny radio -
+![wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/tiny/1118191446.jpg)
+
+Not so tiny radio -
+![wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/TRV2RC5.png)
+
