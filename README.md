@@ -13,12 +13,12 @@ Please contact me if you need different licensing terms.
 Radio Software for high frequency electronics
 
 ## Purpose:
-Feature rich digital VFO software is provied that can be configured "at run time"
-so that people can use it for their own ham radio projects without needing to know how to program.
-On the other hand, all code is provided so that those inclined to can modify it for their own purposes.
+To provide feature rich digital VFO software that can be completely configured "at run time."
+This is not yet completely achieved so early adopters will likely have some experience
+with the Arduino IDE used to compile new versions.
 
 ## Features:
-- One or two clock sources for either a direction conversion or superheterodyne radio by controlling an si5351.
+- One or two clock sources for either a direction conversion or superheterodyne radio.
 - **USB, LSB, CW, AM and digital modes.** Automatic IF shifting as required.
 - selection of up to 4 IF filters with user defined center frequencies, band widths and IF shifts.
 - selection of up to 8 bandpass filters.
