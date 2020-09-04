@@ -1,13 +1,22 @@
 # Text Based Serial Protocol
 
-Text based serial commands are available when configured or any time the processor is first powered on. 
-The power-on-mode activates at 19200 baud which is useful for changing the baud rate if your don't remember it.
+Text based serial protocol is used to configure your tiny radio. 
+It is activated by default by the initial flash of the program or 
+or for the first two seconds when the processor is first powered on. 
+(Enter at least four "b"s on the serial terminal to force change to text mode.)
+
+The default baud rate is normally 38400 but if forced by the "b" method,
+the baud rate will also be forced to 38400 so there's no issue with forgetting a past change.
+
+Enter ```e10 0``` to enter Icom CI-V protocol mode.
 
 Text based commands allow you to activate the radio and configure the EPROM. 
  - "Get" commands always utilize a capital letter. 
  - "Set" commands use the correspponding lower case letter.
 For example, "F" will print the current frequency stored in VFO A.
 "f" followed by a number will set (change) that frequency.
+
+**Note: The need for entering capital letters will change in the next release.**
  
 Supported commands are
  - f,F frequency
