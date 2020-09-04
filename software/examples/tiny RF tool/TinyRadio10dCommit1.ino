@@ -127,7 +127,7 @@ void setup() {
    * Check for boot time actvity on serial line, 
    * is so, switch to text interface
    */
-  Serial.begin(9600);
+  Serial.begin(38400L);
   delay(3000) ;
   if ( int n = Serial.available()) {
     int countBs=0 ;
