@@ -57,61 +57,73 @@ cCQ CQ DE AA2MZ K
 Starting to change an EPROM address but then aborting the change with an "n."
 Note that a short description of all EPROM settings are included in the program.
 ```
-> e20 2000
-# 20 CW      IF Shift = 2000 ?
+> e28 2000
+# 28 CW      IF Shift = 2000 ?
 > n
-# 20 = 500
+# 28 = 500
 ```
-Print all defaults in EPROM
+Print all defaults in EPROM.
+Note that you may not change the values from 0 to 7, there are commands that do that,
+and e8 is the EPROM version number that may change from release to release.
+Also, you may need to reboot (power cycle) for some values to take effect.
 ```
 > E
 e0[ VFO-A Frequency  = ]7040000
-e1[ VFO-A Mode       = ]0
+e1[ VFO-A Mode       = ]3
 e2[ VFO-B Frequency  = ]14300000
-e3[ VFO-B Mode       = ]3
+e3[ VFO-B Mode       = ]1
 e4[ Clock-0 Offset   = ]0
 e5[ Clock-1 offset   = ]0
 e6[ Clock-2 offset   = ]0
 e7[ Clock-2 Mode     = ]0
 e8[ TinyVFO by AA2MZ = ]2020
 e9[ Baud Rate        = ]38400
-e10[ SSB Filter   Low = ]10700000
-e11[ SSB Filter  High = ]10702400
-e12[ AM Filter    Low = ]455000
-e13[ AM Filter   High = ]467000
-e14[ CW Filter    Low = ]8000000
-e15[ CW Filter   High = ]8000400
-e16[ Digi Filter Low  = ]8000000
-e17[ Digi Filter High = ]8003000
-e18[ SSB     IF Shift = ]300
-e19[ AM      IF Shift = ]300
-e20[ CW      IF Shift = ]500
-e21[ Digi    IF Shift = ]300
-e22[ BPF0  Low Freq.  = ]1600000
-e23[ BPF0 High Freq.  = ]3499999
-e24[ BPF1  Low Freq.  = ]3500000
-e25[ BPF1 High Freq.  = ]10100000
-e26[ BPF2  Low Freq.  = ]14000000
-e27[ BPF2 High Freq.  = ]30000000
-e28[ BPF3  Low Freq.  = ]400000
-e29[ BPF3 High Freq.  = ]60000000
-e30[ BPF4  Low Freq.  = ]0
-e31[ BPF4 High Freq.  = ]0
-e32[ BPF5  Low Freq.  = ]0
-e33[ BPF5 High Freq.  = ]0
-e34[ BPF6  Low Freq.  = ]0
-e35[ BPF6 High Freq.  = ]0
-e36[ BPF7  Low Freq.  = ]0
-e37[ BPF7 High Freq.  = ]0
-e38[ LPFn always on?  = ]0
-e39[ LPF0 High Freq.  = ]0
-e40[ LPF1 High Freq.  = ]8000000
-e41[ LPF2 High Freq.  = ]15000000
-e42[ LPF3 High Freq.  = ]0
-e43[ LPF4 High Freq.  = ]30000000
-e44[ LPF5 High Freq.  = ]0
-e45[ LPF6 High Freq.  = ]0
-e46[ LPF7 High Freq.  = ]0
-e47[ Clk-2 Frequency  = ]7040000
-e48[ Rotate display?  = ]1
+e10[ CI-V 0 or text 1 = ]1
+e11[ CW words/minute  = ]13
+e12[ Farnsworth rate  = ]18
+e13[ 1=Paddle reverse = ]1
+e14[ Sidetone Hz      = ]800
+e15[ Analog Key  both = ]350
+e16[ Analog Key   dot = ]450
+e17[ Analog Key  dash = ]800
+e18[ AM Filter    Low = ]0
+e19[ AM Filter   High = ]0
+e20[ SSB Filter   Low = ]0
+e21[ SSB Filter  High = ]0
+e22[ CW Filter    Low = ]0
+e23[ CW Filter   High = ]0
+e24[ Digi Filter Low  = ]0
+e25[ Digi Filter High = ]0
+e26[ SSB     IF Shift = ]300
+e27[ AM      IF Shift = ]300
+e28[ CW      IF Shift = ]500
+e29[ Digi    IF Shift = ]300
+e30[ BPF0  Low Freq.  = ]1600000
+e31[ BPF0 High Freq.  = ]3499999
+e32[ BPF1  Low Freq.  = ]3500000
+e33[ BPF1 High Freq.  = ]10100000
+e34[ BPF2  Low Freq.  = ]14000000
+e35[ BPF2 High Freq.  = ]30000000
+e36[ BPF3  Low Freq.  = ]400000
+e37[ BPF3 High Freq.  = ]60000000
+e38[ BPF4  Low Freq.  = ]0
+e39[ BPF4 High Freq.  = ]0
+e40[ BPF5  Low Freq.  = ]0
+e41[ BPF5 High Freq.  = ]0
+e42[ BPF6  Low Freq.  = ]0
+e43[ BPF6 High Freq.  = ]0
+e44[ BPF7  Low Freq.  = ]0
+e45[ BPF7 High Freq.  = ]0
+e46[ LPFn always on?  = ]0
+e47[ LPF0 High Freq.  = ]0
+e48[ LPF1 High Freq.  = ]8000000
+e49[ LPF2 High Freq.  = ]15000000
+e50[ LPF3 High Freq.  = ]0
+e51[ LPF4 High Freq.  = ]30000000
+e52[ LPF5 High Freq.  = ]0
+e53[ LPF6 High Freq.  = ]0
+e54[ LPF7 High Freq.  = ]0
+e55[ Clk-2 Frequency  = ]7040000
+e56[ Rotate display?  = ]1
+
 ```
