@@ -19,9 +19,7 @@ frequency agile, 40 meter transciever.
 Very tiny radio with optional display:
 ![Wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/very%20tiny/0905191316.jpg)
 
-![Wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/very%20tiny/0905191316b.jpg)
-
+![Wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/software/examples/tiny%20RF%20tool/0903200915.jpg)
 Showing preparation of the Arduino to accept si5351 and optional OLED display
-![Wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/very%20tiny/0905191019a.jpg)
 
 ![Wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/very%20tiny/0905191317.jpg)
