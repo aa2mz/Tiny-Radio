@@ -1,3 +1,14 @@
+This software project is Copyright 2020 by Edward L. Taychert, AA2MZ
+I gift you the right to use it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or a later version. 
+However, portions of the project are licensed under the terms of the Lesser General Public License 
+as published by the Free Software Foundation, either version 3 of the License, or a later version.
+Please see the license contained in each file. 
+**It is my intention that you be able to use this software freely** 
+and also that you may distribute it freely as long as you adhere to the GNU licenses terms.
+see <https://www.gnu.org/licenses/>.
+Please contact me if you need different licensing terms.
+(Also, please consider buying me a cup of coffee or sending electronic parts for me play with.)
 # Tiny-Radio
 Radio Software for high frequency electronics
 
