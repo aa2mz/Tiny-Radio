@@ -50,8 +50,17 @@
 #define CAT_FILTER2   2
 #define CAT_FILTER3   3
 
+enum RadioType {
+  Heterodyne = 0,
+  SDR,
+  RFTool  
+};
+
 class CATRadio {  // inherit from class and implement all methods
   public:
+  virtual CATRadio * setup ( CATRadio* gui) = 0 ; 
+//CATRadio * setup ( CATRadio* gui) { return (CATRadio*) 0; }; // example in derived
+
   virtual int getMode (int vno=0) = 0 ;
   virtual int setMode (int m, int vno=0) = 0 ;
   virtual int getFilter (int vno=0) = 0 ;
@@ -60,6 +69,8 @@ class CATRadio {  // inherit from class and implement all methods
   virtual int setBand (int b, int vno=0) = 0 ;
   virtual long getFrequency (int vno=0) = 0 ;
   virtual long setFrequency (long f, int vno = 0 ) = 0 ;
+  virtual int getIFShift(int cno=1) = 0 ;
+  virtual int setIFShift(int ifs , int cno=1) = 0 ;
   virtual int vfoSwap (void) = 0 ;
   virtual int vfoBeqA (void) = 0 ;  
   virtual int splitCmd (int son=-1 ) = 0 ;

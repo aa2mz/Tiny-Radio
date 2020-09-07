@@ -21,7 +21,7 @@
 #include <EEPROM.h>
 
 // change the version if you change the meaning of EPROM data
-#define D_VERSION 0x10d
+#define D_VERSION 0x12c
 #define D_loaderversion 1
 #define D_loading 0
 /*
@@ -305,7 +305,7 @@ void dictionaryDefault(void)
 #ifndef DICTIONARYCACHING
   eePut((uint32_t *)(D_VFOAFREQUENCY*4+DICT_OFFSET), 7040000L);   
 #endif
-  setDictionary(D_VFOAMODE, 3L);
+  setDictionary(D_VFOAMODE, 0L);
   setDictionary(D_VFOBFREQUENCY, 14300000L);
   setDictionary(D_VFOBMODE, 1L);
 
@@ -333,16 +333,20 @@ void dictionaryDefault(void)
   setDictionary(D_CWAKEYDOT, 450) ;
   setDictionary(D_CWAKEYDASH, 800) ;
   
-  setDictionary(D_FILTER0LOW, 0L); // AM
+  setDictionary(D_FILTER0LOW, 0L); // change for AM, setting used for DC and RFT00L
   setDictionary(D_FILTER0HIGH, 0L+0L);
-  setDictionary(D_FILTER1LOW, 0L); // sideband
-  setDictionary(D_FILTER1HIGH, 0L+0L);
-  setDictionary(D_FILTER2LOW, 0L); // CW
-  setDictionary(D_FILTER2HIGH, 0L+0L);
-  setDictionary(D_FILTER3LOW, 0L); // Digital
-  setDictionary(D_FILTER3HIGH, 0L+0L);
+  setDictionary(D_FILTER1LOW, 8000000L); // sideband
+  setDictionary(D_FILTER1HIGH, 8000000L+1800L);
+  setDictionary(D_FILTER2LOW, 8000000L); // CW
+  setDictionary(D_FILTER2HIGH, 8000000L+400L);
+  setDictionary(D_FILTER3LOW, 8000000L); // Digital
+  setDictionary(D_FILTER3HIGH, 8000000L+4000L);
 
-  setDictionary(D_FILTER0IFSHIFT, 300L);
+// true AM puts the carrier in the middle of a wide filter
+  setDictionary(D_FILTER0IFSHIFT, 0L);
+// side band filters put the (suppressed) carrier frequency below the edge of the filer. 
+// This allows a narrower filter on receive 
+// and better suppresses the unwanted sideband on transmit.
   setDictionary(D_FILTER1IFSHIFT, 300L);
   setDictionary(D_FILTER2IFSHIFT, 500L);
   setDictionary(D_FILTER3IFSHIFT, 300L);

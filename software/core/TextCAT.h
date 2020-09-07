@@ -43,8 +43,8 @@ public:
   int  setBand(void)  ;
   int  getFreq(void) ;
   int  setFreq(void) ;
-  int  getPTT(void) {} ;
-  int  setPTT(void) {} ;
+  int  getPTT(void) {radio->getPtt();} ;
+  int  setPTT(void) {static int p; radio->pttCmd(p=1-p);} ;
   int  sendCW(void) {
 #ifdef TEXT2CW
       keyer.send(cmd+1) ; // not safe, cmd will be over written with next command
@@ -69,7 +69,7 @@ public:
   int setup(int arg = 0) {
     Taskable:: setup(4);
     if ( serial == 0 )
-      serial = (Stream*) &Serial ;
+      setSerial( (Stream*) &Serial) ;
     serial->println("# Hello");
     serial->flush();
   }
@@ -163,6 +163,11 @@ int TextCAT:: getMode(void) { // M
   serial->println((char*)cmd);
 }
 int TextCAT:: setMode(void)  { // m
+  cmd[0] -= 32 ;
+  if (cmd[1] == 0) {
+    getMode();
+    return;
+  }
   int i,m ;
   for (i = 0 ; i < strlen(Mode_Chars) ; i++ )
     if (cmd[1] == Mode_Chars[i] ) 
@@ -175,7 +180,6 @@ int TextCAT:: setMode(void)  { // m
     radio->setMode(i);
   else
     radio->setFilter(i-8);
-  cmd[0] -= 32 ;
   cmd[2] = 0;
   serial->println((char*)cmd);
 }
@@ -208,12 +212,17 @@ int  TextCAT:: getFreq(void) { //F
 }
 int  TextCAT:: setFreq(void) { //f
   cmd[0] -= 32 ;
+  if (cmd[1] == 0) {
+    getFreq();
+    return;
+  }
   radio->setFrequency(atol(cmd+1));
   serial->println((char*)cmd);   
 }
 
 // extra commands not in CATRadio, use a cast
 int  TextCAT:: setBaud(void) {
+  cmd[0] -= 32 ;
   long b ;
   b = (cmd[1]-'0') * 10L + cmd[2]-'0' ;
   if       (b == 12)     b=1200;
@@ -225,10 +234,10 @@ int  TextCAT:: setBaud(void) {
   else  if (b == 57)     b=57600;
   else  if (b == 11)     b=115200;
   else  {
-    serial->println("! Bad Baud");
+//    serial->println("! Bad Baud");
+    getBaud();
     return;
   }
-  cmd[0] -= 32 ;
   serial->println((char*)cmd); 
   serial->flush() ; // make sure reply is visable
   
@@ -240,6 +249,11 @@ int  TextCAT:: getBaud (void){
   serial->println((char*)cmd);     
 }
 int  TextCAT:: setEProm (void) {
+
+  if ( *(cmd+1) == 0 ) {
+    getEProm();
+    return ;
+  }
   int addr=atoi(cmd+1);
   long value;
   char *s = cmd+1 ;
@@ -248,7 +262,7 @@ int  TextCAT:: setEProm (void) {
   while ( *s && !isdigit(*s) && *s != '-' ) s++ ; // find start of value
 
   if (*s == 0 ) {
-    question ();
+    getEProm ();
     return;
   }
   value = atol(s);
@@ -276,7 +290,10 @@ int  TextCAT:: getEProm(void) {
     serial->print(addr); serial->print("[ ");
     serial->print (dictName(addr));
     serial->print (" = ]") ;
-    serial->println( getDictionary(addr)) ;
+    if ( addr == D_COPYRIGHT )
+      serial->println( getDictionary(addr),HEX) ;
+    else
+      serial->println( getDictionary(addr)) ;
   }
 }
 int  TextCAT:: question (void) {
@@ -287,6 +304,11 @@ int  TextCAT:: question (void) {
   }
   if (*cmd == 'Y' || *cmd == 'y') {
     setDictionary(qAddress, qValue);
+    if (qAddress == D_PROTOCOL ) {  // force a restart to change protocols
+      // qqq might not be needed if we had a complete method for their initialization.
+      delay(100);
+      SoftwareReset();
+    }
   }
   serial->print("# ") ;
   serial->print(qAddress); serial->print(" = ") ; serial->println(getDictionary(qAddress)) ;

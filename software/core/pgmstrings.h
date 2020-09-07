@@ -29,6 +29,8 @@ const char S_BA[] PROGMEM="B=A";
 const char S_RESTARTREQUIRED[] PROGMEM="Restart req.";
 const char S_QUESTION[] PROGMEM="!e[addr] [value]"; 
 const char S_BADVALUE[] PROGMEM="!Bad value"; 
+const char S_TRANSMIT[] PROGMEM="Transmit"; 
+const char S_RECEIVE_[] PROGMEM="Receive "; 
 
 //const char S_[] PROGMEM=""; 
 

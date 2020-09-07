@@ -128,9 +128,6 @@ public:
   }
   
   int setFrequency( uint32_t fout, int clkNo= 0) {  // Set a CLK to fout Hz
-//Serial.print(clkNo);
-//Serial.print(" ");
-//Serial.println(fout);
       uint8_t clknum = clkNo;
       uint32_t  msa, msb, msc, msxp1, msxp2, msxp3p2top;
       if ((fout<500000) || (fout>109000000))  // If clock freq out of range

@@ -20,7 +20,7 @@
 #include "tinyradio.h"
 
 /* civ.h Copyright Ed Taychert 2019,2020
- *  
+ *  Emulate an ICom 756, maybe com 7100 and 7610 or Xiegu 5105 
  */
  /* CI-V command/response format
   *  FE FE 98 E0 Cmd# Sub# Data-area FD
@@ -81,6 +81,7 @@ class IcomCI_V : public Taskable {
   int dataLen ; 
   int us, them ;
   int cno, sub, flavor;
+  int mainSubSelect ;
   // pointer to a class member function
   int  (IcomCI_V :: *server)(unsigned char*);
   CATRadio * radio;
@@ -167,7 +168,7 @@ public:
   int setup(int arg = 10) {
     Taskable:: setup(arg);
     if ( serial == 0 )
-      serial = (Stream*) &Serial ;
+      setSerial( (Stream*) &Serial) ;
   }
   int setRadio( CATRadio * r ) {
     radio = r ;
@@ -224,7 +225,7 @@ public:
         case  CIVSPLITCMD:    // 0X0F , return the value set?
           server = &splitCmd ;      
           break ;
-        case  CIV14CMD :  // 0x14 set/get different levels
+        case  CIV14CMD :  // 0x14 set/get various levels
           server = &civ14Cmd ;
           break ;
         case  CIVGETID :      // 0x19
@@ -287,23 +288,43 @@ int IcomCI_V:: setMode (unsigned char*cmd){
 }
 
 int IcomCI_V:: getFreq (unsigned char*cmd){
-  long f = radio->getFrequency();
+  long f = radio->getFrequency(mainSubSelect);
   f2CIV(f);
 }
 
 int IcomCI_V:: setFreq (unsigned char*cmd){
   long f = CIV2f((unsigned char*)(cmd+1)); 
-  radio->setFrequency(f);
+  radio->setFrequency(f, mainSubSelect);
   okayCmd();
 }
 
 int IcomCI_V:: vfoCmd (unsigned char*cmd){
+/* 0x07 - map extended main and sub commands into vfoA and vfoB commands
+Select the VFO mode
+00      Select VFO A
+01      select VFO B
+A0      equalize B=A
+B0      Exchange main and sub bands
+B1      Equalize main and sub bands
+D0      Select the main band (is vfo a)
+D1      Select the sub band (is vfo b)
+D2* 00  Send/read main band selection
+    01  Send/read sub band selection
+*/    
   int c = cmd[0];
   int s = cmd[1];
+
   switch (cmd[1]) {
     case 0x00 : // select A, no-op
-      break ;
+    case 0xd0 :
+      mainSubSelect = 0 ;
+      radio->splitCmd (mainSubSelect);
+    break ;
+    case 0xd1 :
     case 0x01 : // select B
+      mainSubSelect = 1 ; 
+      radio->splitCmd (mainSubSelect);
+    break;   
     case 0xb0 : // swap AB
       radio->vfoSwap();
       break;
@@ -311,6 +332,17 @@ int IcomCI_V:: vfoCmd (unsigned char*cmd){
     case 0xb1 : // B = A
       radio->vfoBeqA();
       break;
+    case 0xd2 : // read vfo
+      if (cmd[3] == 0xfd ) { // what the freq?
+        if (cmd[2] == 0 )
+          f2CIV(radio->getFrequency(0));
+        else 
+          f2CIV(radio->getFrequency(1));
+      } else { // set the freq QQQQ
+        long f = CIV2f((unsigned char*)(cmd+3));      
+        radio->setFrequency(f, cmd[2]);
+      }
+      return ;
     default:
       nakCmd(0);
       return ;
@@ -325,9 +357,28 @@ int IcomCI_V:: splitCmd (unsigned char*cmd){
 }
 
 int IcomCI_V:: civ14Cmd( unsigned char*cmd) {
-  // qqqqq should be able to do
-  // 0x09 CW pitch
-  // 0x0c Key speed
+  // qqqqq might be able to do come of these
+  switch (cmd[1]) {
+    case 0x07 : // if shift 128 = 0 ;
+      int shift = cmd[2]-128;
+      radio->setIFShift(shift*10);
+      break ;
+    case 0x09 : // CW tone 0 - 255
+      int deltaTone = (128-cmd[2]) * 4 ; // plus or minus 512
+      setDictionary(D_CWSIDETONE, 800 + deltaTone) ;
+#ifdef TINYKEYER    
+      keyer.setSideTone(P_SIDETONE,getDictionary(D_CWSIDETONE)); // tone pin out, hertz 
+#endif
+      break ;
+    case 0x0a : // RF power 0 - 255 (not FD!!!)
+    case 0x0f : // break-in 0=2, 255 = 13 (?ms?)
+    case 0x18 : // LCD contrast, hA HA Ha
+    case 0x19 : // LCD brightness
+    case 0x1a : // notch filter 0-255
+      break;
+    default:
+      okayCmd();
+  }
   okayCmd();
 }
 int IcomCI_V:: getID (unsigned char*cmd) {

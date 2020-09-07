@@ -65,17 +65,18 @@ If TINYRFTOOL is defined, the definition for the analog pins change.
 // 2 = CW
 // 3 = DIGITAL (RTTY in CI-V interface)
 // numbering supports undecoded selections if you only have SSB and CW filters
-#define P_IFF0 A1
 
 #ifdef TINYRFTOOL
+#define P_IFF0 0
 #define P_IFF1 0
-#define P_AUDIOIN 0
+#define P_AUDIOIN A1
 #define P_TXFORWARD 0
 #define P_TXREVERSE 0
 #define P_POWER A2
 #define P_GROUND A3
 #else
 
+#define P_IFF0 A1
 #define P_IFF1 A2
 #define P_AUDIOIN A3
 #define P_TXFORWARD A6
@@ -232,3 +233,8 @@ EncoderTask bigKnob(11,12); // for default GUI, create encoder "bigknob" on pins
 // static member initializer for EncoderTask 
 EncoderTask *Encoders[3] = {0, &bigknob, 0} ; // helper for interupt handler
 #endif
+
+// reset is needed to use changed setup values
+void SoftwareReset() {
+    asm volatile ( "jmp 0");  // you must rigorously enforce *all* I/O initialization with this method.
+}
