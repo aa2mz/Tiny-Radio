@@ -50,7 +50,7 @@ public:
       keyer.send(cmd+1) ; // not safe, cmd will be over written with next command
 #endif
     } ;
-  int  setWPM(void) {} ;
+  int  setWPM(void) ; 
   int  nakCmd(void) {
     serial->print("! ");
      serial->write(cmd, ncmd) ;
@@ -73,11 +73,17 @@ public:
     serial->println("# Hello");
     serial->flush();
   }
-  int loop(int arg=0) {
-    if ( serial->available() == 0 ) 
-      return ;
+  int loop(int arg=0 ) {
+    // yes, this slow but we want a one character behavior
+    // to support the KeyCmdr() 
+    // qqqq improve by looping on available();
+    if ( serial->available() ) {
+      loopCharacter (Serial.read() ) ;
+    }
+  }
+  int loopCharacter (int arg ) {
     if ( state == TCSTART ) {
-      cmd[0] = serial->read();
+      cmd[0] = arg ;
       ncmd = 1 ;
       if (cmd[0] == '\n' || cmd[0] == '\r' || cmd[0] == 0 ) {
         ncmd = 0 ;
@@ -119,10 +125,11 @@ public:
       }
       state = TCREAD ;
       if (qState > 0 ) qState -- ;
+      return ;
     }
     if ( state == TCREAD ) {
-      while ( serial->available() ) {
-        cmd[ncmd] = serial->read();
+      do  {
+        cmd[ncmd] = arg ;
         if (cmd[ncmd] >= 'a' && cmd[ncmd] <= 'z' ) // convert to uppercase
           cmd[ncmd] -= 32 ;
         if (cmd[ncmd] == '\n' || cmd[ncmd] == '\r' || cmd[ncmd] == 0 ) { 
@@ -135,7 +142,7 @@ public:
           ncmd -- ;
           cmd[ncmd] = 0 ;
         }
-      }
+      } while (0) ;
       if (state != TCDOIT)  // not at EOL yet
         return ;
     }
@@ -151,6 +158,19 @@ public:
     return ;
   }
 }  ;
+
+int getTwoLong(char* s, long* first, long* second){
+  char *p;
+  if (s==0) return 0;
+  for (p = s; isdigit(*p) ; p++) ; // find end of first number
+  if ( p == s ) return 0 ;
+  *first = atol(s);
+  if (*p == 0 ) return 1;
+  for (s = p; !isdigit(*p) ; p++) // find start of second number
+    if ( *p == 0 ) return 1;
+  *second = atol(s);
+  return 2;
+}
 
 // qqq move to progmem
 char *Mode_Chars = "LUACDF_RY123" ;
@@ -212,7 +232,8 @@ int  TextCAT:: getFreq(void) { //F
 }
 int  TextCAT:: setFreq(void) { //f
   cmd[0] -= 32 ;
-  if (cmd[1] == 0) {
+  long f = atol(cmd+1);
+  if (f == 0) {
     getFreq();
     return;
   }
@@ -248,6 +269,7 @@ int  TextCAT:: getBaud (void){
   ltoa(((TinyRadio*)radio)->getBaud(),cmd+1,10);
   serial->println((char*)cmd);     
 }
+
 int  TextCAT:: setEProm (void) {
 
   if ( *(cmd+1) == 0 ) {
@@ -314,4 +336,34 @@ int  TextCAT:: question (void) {
   serial->print(qAddress); serial->print(" = ") ; serial->println(getDictionary(qAddress)) ;
   qState = 0 ;
 }
+int TextCAT::  setWPM(void) { // some whacky rationalizations here
+
+  long wpm, charRate;
+  int numnum;
+
+  numnum = getTwoLong (cmd+1, &wpm, &charRate) ;
+  if (numnum == 0 ) {
+    Serial.print("C ");
+    Serial.print(getDictionary(D_CWWPM));
+    Serial.print(' ');
+    Serial.println(getDictionary(D_CWFARNSWORTH));    
+  } else if ( wpm > 55 ) {
+    Serial.println(pgm2string(S_TOOFAST));
+  } else {
+    if (numnum == 1 ) {
+      charRate = getDictionary(D_CWFARNSWORTH) ;
+    }
+    if ( wpm > charRate) 
+      charRate = wpm ;
+    setDictionary(D_CWWPM, wpm);
+    setDictionary(D_CWFARNSWORTH, charRate);        
+
+    keyer.setWPM(wpm, charRate);     // qqq embarassing global variable
+    Serial.print("C ");
+    Serial.print(wpm);
+    Serial.print(' ');
+    Serial.println(charRate);
+  }
+  
+} ;
 #endif

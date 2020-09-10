@@ -15,6 +15,18 @@
 
 // requires about 530 bytes flash and 8 bytes ram
 #ifdef TEXT2CW
+
+#define KEYstraight 4
+#define KEYdot 1
+#define KEYdash 2
+#define KEYboth 3
+#define KEYnone 0
+#define KEYchar 5
+#define KEYword 6
+#define KEYup 7
+// qqqq the above ugly definitions would be cured by making seperate .cpp and .h files
+// for one of the routines in the dependancy loop
+
 #include <avr/pgmspace.h>
 
 const unsigned int cwALPHA[] PROGMEM = {
@@ -115,7 +127,7 @@ class Text2CW {
       }
       if (punct == 0 || c == ' '){ 
 //Serial.println(' '); // end of word
-        return KEYnone ;
+        return KEYword ;
       } 
     }
   }
@@ -128,7 +140,7 @@ class Text2CW {
     els = (els>>1);
     if ( bits == 0 ) {
 //Serial.print(' ');
-      return KEYnone ;
+      return KEYchar ;
     } else if (bits == 1 ) {
 //Serial.print('.');
       return KEYdot ;
@@ -152,7 +164,7 @@ class Text2CW {
     if ( cp == 0)
       return KEYnone ;
     key = cwKey();
-    if ( key == KEYnone) {
+    if ( key == KEYchar || key == KEYword ) {
       cp ++ ;
       if ( *cp ) {
         cwStart(*cp);
@@ -163,7 +175,40 @@ class Text2CW {
     }
     return key;
   }
-
+  char CW2Text(unsigned int elements){
+  // reverse the bits
+    unsigned int out ;
+    char c ;
+  
+    for (int i = 0 ; i < 16 ; i++ ) {
+      out <<= 1u ;
+      out |= elements & 0x1 ;
+      elements >>= 1u ;
+    } 
+    for (int i = 0 ; i < 16 ; i++ ) {
+      if (out & 1) break ;
+      out >>= 1 ;
+    }
+    for ( int i = 0 ; i < 26 ; i++ ) {
+      if (out == pgm_read_word(cwALPHA+i) ) {
+        c = i + 'A' ;
+        return c ;
+      }
+    }
+    for ( int i = 0 ; i < 10 ; i++ ) {
+      if (out == pgm_read_word(cwDIGIT+i) ) {
+        c = i + '0' ;
+        return c ;
+       }
+    }
+    for ( int i = 0 ; i < 24 ; i++ ) {
+      if (out == pgm_read_word(cwPUNCT+i) ) {
+        c = pgm_read_byte(asPUNCT+i) ;
+        return c ;
+       }
+    }
+    return('\007');
+  }
 } ;
 
 #endif

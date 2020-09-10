@@ -21,7 +21,7 @@
 #include <EEPROM.h>
 
 // change the version if you change the meaning of EPROM data
-#define D_VERSION 0x12c
+#define D_VERSION 0x13a
 #define D_loaderversion 1
 #define D_loading 0
 /*
@@ -46,7 +46,7 @@ const char TD_CLK2OFFSET[] PROGMEM ="Clock-2 offset  ";
 const char TD_CLK2MODE[] PROGMEM =  "Clock-2 Mode    ";
 
 #define D_COPYRIGHT 8
-const char TD_COPYRIGHT[] PROGMEM ="TinyVFO by AA2MZ";
+const char TD_COPYRIGHT[] PROGMEM ="Tiny Radio/AA2MZ";
 
 #define D_BAUDRATE D_COPYRIGHT+1
 const char TD_BAUDRATE[] PROGMEM ="Baud Rate       "; 
@@ -320,7 +320,7 @@ void dictionaryDefault(void)
   setDictionary(D_PROTOCOL, 1 ) ; // default is text not CI-V 
   setDictionary(D_CWWPM, 13L);
   setDictionary(D_CWFARNSWORTH, 18L);
-  setDictionary(D_CWKEYREVERSE, 1) ;
+  setDictionary(D_CWKEYREVERSE, 0) ;
   setDictionary(D_CWSIDETONE, 800) ;
 
 /*
@@ -329,7 +329,7 @@ void dictionaryDefault(void)
  * Value are 5 volts scaled to A2D values 0 - 1023 
  * using a 4.7K pullup to a 10K and 2.2K pulldown
  */
-  setDictionary(D_CWAKEYBOTH, 350) ;
+  setDictionary(D_CWAKEYBOTH, 325) ;
   setDictionary(D_CWAKEYDOT, 450) ;
   setDictionary(D_CWAKEYDASH, 800) ;
   

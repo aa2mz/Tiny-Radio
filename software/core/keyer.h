@@ -26,11 +26,15 @@
 #define KSdashOFF 7
 #define KSdashAFTER (8 | KSneedREAD)
 
+// qqq sync these in text2cw.h
 #define KEYstraight 4
 #define KEYdot 1
 #define KEYdash 2
 #define KEYboth 3
 #define KEYnone 0
+#define KEYchar 5
+#define KEYword 6
+#define KEYup 7
 
 // support 3 keyer styles
 #define KEYERstraight 4
@@ -42,10 +46,6 @@
 #define KEYERraw 8
 #include "tinytasker.h"
 
-#ifdef TEXT2CW
-#include "text2cw.h"
-Text2CW text2CW;
-#endif
 
 // -----------Class to support reading straigt keys and paddles
 
@@ -53,8 +53,8 @@ class CodeKey : public Taskable {
   int pinDot, pinDash;
   int keyRead ;
   int keyerStyle;
-  int analogReverse;
-  public:
+  int analogReverse; 
+public:
   CodeKey () { 
     keyRead = KEYnone ; 
     setup(20); 
@@ -99,14 +99,15 @@ class CodeKey : public Taskable {
   int loop (int arg = 0 ) {
     if ( keyerStyle == KEYERanalog ) {
       int l = analogRead(pinDot) ;
-      if ( l < getDictionary(D_CWAKEYBOTH) )
+      if ( l < getDictionary(D_CWAKEYBOTH) ) {
         keyRead |= KEYdot | KEYdash ;
-      else if ( l < getDictionary(D_CWAKEYDOT) ) 
+      } else if ( l < getDictionary(D_CWAKEYDOT) ) {
         keyRead |= (analogReverse?KEYdash:KEYdot) ; 
-      else if ( l < getDictionary(D_CWAKEYDASH) )
+      } else if ( l< getDictionary(D_CWAKEYDASH) ) {
         keyRead |= (analogReverse?KEYdot:KEYdash) ;  
-#if 0
-if (keyRead) {
+      }
+#if 1
+if ( l < 1000 && getDictionary(D_CWAKEYDOT) > getDictionary(D_CWAKEYDASH)  ) {
 Serial.print(l) ;
 Serial.print(" ");
 Serial.println(keyRead,BIN); 
@@ -138,7 +139,61 @@ class Keyer : public Taskable {
   int keyerStyle ;
   int sideTone ;
   int sideTonePin ; // choice has side effects. See "tone()" for explain
-  public:
+
+  unsigned int elementHistory ;
+
+  int element() { // only Farnsworth timing if sending text2CW
+#ifdef TEXT2CW
+    if (text2CW.busy())
+      return farnsworthMS ;
+    else
+#endif
+    return elementMS ;    
+  }
+  int farnsworth() {// only Farnsworth timing if sending text2CW
+#ifdef TEXT2CW
+    if (text2CW.busy())
+      return farnsworthExtra ;
+    else
+#endif
+    return 0 ;
+  }
+  int getKey() {
+#ifdef TEXT2CW
+    if ( text2CW.busy() )
+      return text2CW.loop();
+#endif
+//    if ( keyerStyle == KEYERstraight)
+//      return codeKey.readNow();
+    return codeKey.read();
+  }
+  int setCW (int on) {
+    digitalWrite(keyOUT,on);
+    if (sideTone > 0 ) {
+      if (on)
+        tone(sideTonePin,sideTone);
+      else
+        noTone(sideTonePin);
+    }
+  }
+  int dotON(void) {
+    setCW(1);
+//Serial.print(".");
+    state = KSdotOFF ;
+    setup( element() + weightMS );
+    elementHistory  = elementHistory  << 2u;
+    elementHistory |= 0b01;
+  }
+  int dashON(void) {
+    setCW(1);
+//Serial.print("-");
+    state = KSdashOFF ;
+    setup( element()*3 + weightMS );
+    elementHistory  = elementHistory << 3u ;
+    elementHistory |= 0b011u;
+  }
+
+public:
   
   Keyer () {
     state = KSidle ;
@@ -180,63 +235,18 @@ class Keyer : public Taskable {
   int setWeight(int w = 0 ){ // adjust for preference or QSK operation 
     weightMS = 0 ;
   }
-  int element() { // only Farnsworth timing if sending text2CW
-#ifdef TEXT2CW
-    if (text2CW.busy())
-      return farnsworthMS ;
-    else
-#endif
-    return elementMS ;    
-  }
-  int farnsworth() {// only Farnsworth timing if sending text2CW
-#ifdef TEXT2CW
-    if (text2CW.busy())
-      return farnsworthExtra ;
-    else
-#endif
-    return 0 ;
-  }
+
 #ifdef TEXT2CW
   int send ( char * s) {
     keying = 1;
     text2CW.setup(s) ;
   }
 #endif
-  int getKey() {
-#ifdef TEXT2CW
-    if ( text2CW.busy() )
-      return text2CW.loop();
-#endif
-//    if ( keyerStyle == KEYERstraight)
-//      return codeKey.readNow();
-    return codeKey.read();
-  }
-  int setCW (int on) {
-    digitalWrite(keyOUT,on);
-    if (sideTone > 0 ) {
-      if (on)
-        tone(sideTonePin,sideTone);
-      else
-        noTone(sideTonePin);
-    }
-  }
-  int dotON(void) {
-    setCW(1);
-//Serial.print(".");
-    state = KSdotOFF ;
-    setup( element() + weightMS );
-  }
-  int dashON(void) {
-    setCW(1);
-//Serial.print("-");
-    state = KSdashOFF ;
-    setup( element()*3 + weightMS );
-  }
   
   int loop(int arg) {
 #ifdef TEXT2CW
     if (text2CW.busy())
-      return paddleLoop();
+      return textLoop();
 #endif
     if (keyerStyle == KEYERpaddle)
       return paddleLoop ();
@@ -245,7 +255,52 @@ class Keyer : public Taskable {
     else
       return straightLoop ();
   }
-  
+private:  
+  int textLoop(int arg=0 ) {
+    static int needRead = 1;
+    static int k;
+
+    if ( needRead==1) { // was quiet; lets get a key
+      k = getKey();
+      needRead = 0 ;
+    }
+
+    switch (k) {
+      case KEYup: // after element spacing ;
+        setCW(0);
+        setup( element()); // +farnsworth());
+        needRead = 1;
+        break;
+      case KEYdot:
+        dotON();
+        setup( element()-weightMS);
+        k = KEYup;
+        break;
+      case KEYdash :
+        dashON();
+        setup( element()*3-weightMS);
+        k = KEYup;
+        break;
+      case KEYchar:
+        keyCmdr.push(elementHistory) ;
+        setup( element()*3+farnsworth());
+        elementHistory = 0 ;
+        needRead = 1 ;
+        break ;
+      case KEYword:
+        setCW(0);
+        keyCmdr.push(0);
+        elementHistory = 0 ;
+        setup( element()*7+2*farnsworth());
+        needRead = 1 ;
+        break ;
+      case KEYnone: // not here!!!
+        setCW(0);
+        keyCmdr.push(0);
+        elementHistory = 0 ;
+        return;
+    }
+  }
   int straightLoop () {
     static int lastKey = KEYnone ;
     int k = getKey();
@@ -289,29 +344,43 @@ class Keyer : public Taskable {
   }
   int paddleLoop() {
     int k ;
+static int firstIdle ;
     if ( state & KSneedREAD )
       k = getKey();
     switch (state) {    
       case KSidle :
-        if ( k & KEYdash ) // priority to dash so N's and C's start before A's and W's
+        if ( k & KEYdash ) { // priority to dash so N's and C's start before A's and W's
           dashON() ;
-        else if ( k & KEYdot )
+          firstIdle = 1;
+        } else if ( k & KEYdot ) {
           dotON() ;
-        else {  // stay idle
+          firstIdle = 1 ;
+        } else {  // stay idle
           state = KSidle ;
+          if (firstIdle == 1 ) {
+            keyCmdr.push(elementHistory) ; // send a space to end the word
+            elementHistory = 0 ; // start new word
+            firstIdle = 0 ;
+          }
           setup (element()) ; // check back later after a dit-time, AKA "elementMS"
         }
         return ;
       case KScharWAIT :
         if (k == KEYnone ) { // wait for a new word
-//Serial.print(" ");
+          // call the character handler
+          keyCmdr.push(elementHistory) ; // decode the first char in a word
+          elementHistory = 0 ; 
           state = KSidle ;
           setup(element()*4+farnsworth()) ; // have alread waited 3 of 7 elementMSs
           return;
         } else if ( k & KEYdash ) {   // priority to dash so N's and C's start before A's
+          keyCmdr.push(elementHistory) ; // start a second or later char in the same word
+          elementHistory = 0 ; 
           dashON();
           return ;
         } else if ( k & KEYdot ) {
+          keyCmdr.push(elementHistory) ; // start a second or later char in the same word
+          elementHistory = 0 ; 
           dotON() ;
           return ;
         } 

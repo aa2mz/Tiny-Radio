@@ -17,6 +17,7 @@
 
 // WARNING buffer only has enough space for sizeof(buffer)-1 characters
 const char S_SPACES8[] PROGMEM="        "; 
+const char S_WELCOME[] PROGMEM="Welcome" ;
 const char S_TUNE[] PROGMEM ="Tune";
 const char S_BY[] PROGMEM="by"; 
 const char S_SPLIT[] PROGMEM ="Split";
@@ -31,6 +32,7 @@ const char S_QUESTION[] PROGMEM="!e[addr] [value]";
 const char S_BADVALUE[] PROGMEM="!Bad value"; 
 const char S_TRANSMIT[] PROGMEM="Transmit"; 
 const char S_RECEIVE_[] PROGMEM="Receive "; 
+const char S_TOOFAST[] PROGMEM="!Too fast";
 
 //const char S_[] PROGMEM=""; 
 

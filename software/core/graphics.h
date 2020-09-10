@@ -30,6 +30,9 @@
 /*
  * Requires two font sizes, inverse and blinking characters.
  * Screen is layed out as 4 rows of 16 colums. # displayed depends on character size.
+ * 
+ * Think of it as a 4 line display that has superscripts. 
+ * Superscripts are 1 column wide. Normal characters are 2 columns wide.
  */
 class Graphics  {
 //  int pause ;
@@ -55,7 +58,7 @@ class OledGraphics :  public Taskable {
   // blinks look better with more on-time than off.
   int brow, bcol, nchar, bType, btime; 
   int  bperiod ,  bduty;   
-  
+  int prow, pcol, rrow, rcol ;
   void blink(int how) {
     int c , size ;
     int col = bcol ;
@@ -127,8 +130,10 @@ public:
   void eraseLine(int row ){
     if ( row < 0 || row > 3) 
       return ;
-    oledWriteString(0, 0, row, pgm2string(S_SPACES8), SIZE2, 0, 1);
-    memset(screen + row*16, 16, ' ');     
+    oledWriteString(0, 0, row*2, pgm2string(S_SPACES8), SIZE2, 0, 1);
+    for ( int c = 0 ; c < 16 ; c++ ) 
+      screen[row][c] = ' ' ; 
+    screen[row][16] = 0 ;    
   }
   void eraseEOL(int row, int col) { // 
     for (; col < 16; col++)
@@ -176,17 +181,79 @@ public:
     char s[2];
     s[0]= c & 0x7f ; // make sure character isn't fu'ed
     s[1] = 0 ;
+//Serial.println((char*)s);
     if ( font == SIZE2) {
       oledWriteStringStretched( 0, col*8, row*2, (char*)s, bInvert, 1);
       screen[row][col] = (c & 0x7fu) ;      
-      screen[row][col+1] = (c & 0x7fu ) ; // qqqqq it'll be okay if were are consistant ???      
+      screen[row][col+1] = (c & 0x7fu ) ; // qqqqq it'll be okay if were are consistant ???     
     } else { 
       oledWriteStringNormal   ( 0, col*8, row*2, (char*)s, bInvert, 1);
       s[0]=' '; s[1]=0;
       oledWriteStringNormal   ( 0, col*8, row*2+1, (char*)s, bInvert, 1);
-      screen[row][col] = (c | 0x80u) ;       
+      screen[row][col] = (c | 0x80u) ;     
     }   
-  } ;
+  } 
+  int type(int c, int row, int size = SIZE2 ) {
+    // advance to next position
+    int w = ((size==SIZE1)?1:2) ;
+
+    if (row == 0 ) {    // type to the magnifier
+      if ( rcol + w > 15 ) {  // scroll
+        //char save = screen[0][0];
+        rcol = scrollLeft(0); 
+        //type(save,1, SIZE1 );
+      } 
+      writeChar(0, rcol, c, 0, size);
+      rcol += w;
+      type(c,1, SIZE1 ); // ;
+    } else {            // type to the sheet
+      if ( prow == 0 ) prow = 1;
+      // do we need to scroll
+      if ( pcol + w > 15 ) {
+        prow ++ ;
+        pcol = 0;
+      } 
+      if (prow > 3 ){
+        scrollUp(1);
+        prow=3;
+        pcol=0;
+      }
+      // show the char
+      writeChar(prow,pcol,c,0,size);
+      pcol += w ;
+    }
+  }
+  int types( char*s, int row, int size = SIZE2) {
+    while (*s) type(*s++, row, size);
+  }
+
+  int scrollLeft (int row=0) {
+    int w, col;
+    for ( col = 0 ; col < 13 ; ){
+      char c = screen[row][col] ;
+      w = ((c&0x80)?1:2);       // width of char we are overwriting...
+      c = screen[row][col+w] ;  // ... with this char...
+      w = ((c&0x80)?1:2);       // ... that has this width
+      writeChar(row,col, c, 0, ((w==1)?SIZE1:SIZE2) );
+      col += w ;
+    }
+    if ( col == 13 )
+      writeChar(row,13,' ', 0, SIZE1); //   
+    writeChar(row,14,' ', 0, SIZE2); // must have a size2 amount of room
+    return col ;
+  }
+  int scrollUp(int start = 0 ) {
+//    eraseLine(start);
+    for ( int r = start+1; r < 4 ; r ++ ) {
+      for ( int c = 0 ; c < 16 ; ) {
+        int w = ((screen[r][c]&0x80)?1:2);
+        if (c+w > 15 ) break ;
+        writeChar(r-1,c,screen[r][c],0, ((w==1)?SIZE1:SIZE2));
+        c += w ;
+      }
+    }
+    eraseLine(3);
+  }
   
   void init (int rotation = 0) {     // 0 = rotatee 0 degrees, 1 == rotate 180
     bperiod = 0;
@@ -209,6 +276,10 @@ public:
         delay(1000);
 #endif
 //          oledFill(0, 1);
+        eraseScreen();
+        oledWriteStringStretched( 0, 4, 4, pgm2string(S_WELCOME), 0, 1);
+        oledWriteStringNormal( 0, 0, 7, pgm2string(TD_COPYRIGHT), 0, 1);
+        delay(800);
         eraseScreen();
     }
   } ;

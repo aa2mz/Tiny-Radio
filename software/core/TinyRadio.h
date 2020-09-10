@@ -100,7 +100,9 @@ CATRadio * TinyRadio:: setup( CATRadio* myGui) {
   return prior ; // this facilitates GUI stacking/sub-windows
 }
 
-int TinyRadio:: getMode (int vno=0) { return vfo[vno]. mode; } ;
+int TinyRadio:: getMode (int vno=0) { 
+  return vfo[vno]. mode; 
+  } ;
 int TinyRadio:: setMode (int m, int vno=0) { 
   if(gui) gui->setMode(m,vno);
   vfo[vno]. mode = m ; 
@@ -120,7 +122,9 @@ int TinyRadio:: setBand (int b, int vno=0) {
   if(gui) gui->setBand(b,vno);
   return vfo[vno]. band=b;
 };
-long TinyRadio:: getFrequency (int vno=0) { return vfo[vno]. frequency; } ;
+long TinyRadio:: getFrequency (int vno=0) { 
+  return vfo[vno]. frequency; 
+  } ;
 long TinyRadio:: setFrequency (long f, int vno = 0 ) { 
   // "setClocks()" will tell gui what to show
   vfo[vno]. frequency=f ;
