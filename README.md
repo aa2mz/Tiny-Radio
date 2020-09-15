@@ -1,6 +1,6 @@
 Its a "tiny radio" because the project cost is so small, maybe under $10 USD to get started.
 But the list of features is huge.
-Skip past the Copyright, where I make the software free to use, to see the list.
+Skip past the Copyright, where I make the software free for you to use, to see the list.
 
 This software project is Copyright 2020 by Edward L. Taychert, AA2MZ
 I gift you the right to use it under the terms of the GNU General Public License as published by
@@ -14,12 +14,18 @@ see <https://www.gnu.org/licenses/>.
 Please contact me if you need different licensing terms.
 (Also, please consider buying me a cup of coffee or sending electronic parts for me play with.)
 # Tiny-Radio
-Radio Software for high frequency electronics
+Radio Software to control radio electronics
 
-## Purpose:
-To provide feature rich digital VFO software that can be completely configured "at run time."
-This is not yet completely achieved so early adopters will likely have some experience
-with the Arduino IDE used to compile new versions.
+## Ideas:
+While a full-featured radio is possible with this software, 
+you might also make smaller accessories to extend the capabilities of your existing radio. The same software can be used to make
+- a digital VFO for your Forty-9er, uBitx, SSB6.1 or other kit radio.
+- a digital VFO for your old radio
+- a CAT/PTT control for your PC/Mac/Rasberry Pi application. Support digital apps with your radio.
+- full computer control for your radio, emulates Icom protocol.
+- a standalone variable speed keyer for your radio.
+- a text to CW converter for automated messages and responses.
+
 
 ## Features:
 - One or two clock sources for either a direction conversion or superheterodyne radio.
@@ -50,13 +56,13 @@ Three hardware "reference designs" are included with this project varying from t
 to that of a classical amatuer HF radio.
 Applicable schematics, gerber files and BOMs are included in this repository.
 
-Very tiny radio -
+Very tiny controller for a direct conversion or superheterodyne radio or a three frequency RF generator for your bench -
 ![Wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/very%20tiny/0905191316.jpg)
 
-Tiny radio -
+Tiny radio , a good fit for a Forty-9er kit that adds a keyer and PC control.
 ![wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/tiny/1118191446.jpg)
 
-Not so tiny radio -
+Not so tiny full features radio with supporting electronics -
 ![wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/TRV2RC5.png)
 
 All supported by the same software without recompilation.
