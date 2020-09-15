@@ -1,3 +1,7 @@
+Its a "tiny radio" because the project cost is so small, maybe under $10 USD to get started.
+But the list of features is huge.
+Skip past the Copyright, where I make the software free to use, to see the list.
+
 This software project is Copyright 2020 by Edward L. Taychert, AA2MZ
 I gift you the right to use it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or a later version. 
