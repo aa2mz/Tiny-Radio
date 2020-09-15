@@ -1,9 +1,11 @@
 # not so tiny radio
 
 **Caution! This hardware is under delopment, untested and might not work!**
+
 Testing so far: 
 - Software: The digital core and software works. 
-- Hardware: The encoder knob and button work. 
+- Hardware: The card is a little bit small for the case.
+The encoder knob and button work. 
 Theres a short to ground in mic input; see it on the schematic? 
 Soldering a discrete capacitor and resistor to the tip if the mic plugs gets
 the microphone preamp working nicely. 
@@ -59,7 +61,8 @@ the pads and spacing are about the size of a TO-92 transistor and you should be 
 solder leaded components to them.
 
 Project Case - about $15 USD. Its plastic but can be sheilded internally if required.
-![project case](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/plastic%20box.jpg)
+![project case](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/plastic%20case.jpg)
+![project case](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/not%20tiny%20radio.jpg)
 Search eBay for "Project Box 200x175x70mm"
 
 ![schema](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/Sheet_1.png)
@@ -71,4 +74,7 @@ The next rev should include addional circuitry to switch the relays.
 
 ![schema](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/Sheet_2.png)
 
-Notes page 1 - Electret mic input probably doesn't need an amplfier prior to use by an IC mixer. The ne602/sa612 requires that the input be in the micro volt range. Adjust the values of ISR1 and ISR2 to get the voltage levels of the line-in and microphone down to at most  63 millivolts PP at 50 ohms or 350mV PP at 1500 ohms for use by an ne602/sa612.
+Notes page 1 - Electret mic input probably doesn't need an amplfier prior to use by an IC mixer. 
+I used a 1.5K resistor as ISR2 to get a nice line level out.
+
+But the ne602/sa612 requires that the input be in the micro volt range. Adjust the values of ISR1 and ISR2 to get the voltage levels of the line-in and microphone down to at most  63 millivolts PP at 50 ohms or 350mV PP at 1500 ohms for use by an ne602/sa612.
