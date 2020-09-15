@@ -1,8 +1,18 @@
 # not so tiny radio
 
 **Caution! This hardware is under delopment, untested and might not work!**
+Testing so far: 
+- Software: The digital core and software works. 
+- Hardware: The encoder knob and button work. 
+Theres a short to ground in mic input; see it on the schematic? 
+Soldering a discrete capacitor and resistor to the tip if the mic plugs gets
+the microphone preamp working nicely. 
+I sub'ed a 1.5K resistor for ISR2.
+With that fix and the input select switch and level control gets a nice 2v p-p signal or less out of the input select header;
+although the sense of the level knob is backwards. (Clockwise reduces the level.)
+- Testing nest: Audio vox for PC digital modes.
 
-The next level of hardware development adds features to support a more complete radio build
+This next level of hardware development adds features to support a more complete radio build
 such as an UBitx or SSB6.1 transciever.
 
 ![wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/TRV2RC5.png)
