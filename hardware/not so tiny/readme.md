@@ -61,7 +61,7 @@ the pads and spacing are about the size of a TO-92 transistor and you should be 
 solder leaded components to them.
 
 Project Case - about $15 USD. Its plastic but can be sheilded internally if required.
-![project case](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/plastic%20case.jpg)
+![project case](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/plastic%20box.jpg)
 ![project case](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/not%20tiny%20radio.jpg)
 Search eBay for "Project Box 200x175x70mm"
 
