@@ -15,6 +15,8 @@ With that fix and the input select switch and level control gets a nice 2v p-p s
 although the sense of the level knob is backwards. (Clockwise reduces the level.)
   - The audio VOX works in full QSK/full breaking but I expected there to be some hang time.
 I will implement programable hang-time in software.
+  - Oh, look! The "ground" on the right side of S-Meter isn't connected to ground. 
+  A short jumper from the bottom of  SD1  top the left of AD4 fixes this.
 - Testing next: S-Meter.
 
 This level of hardware development adds features to support a more complete radio build
