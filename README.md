@@ -28,6 +28,10 @@ you might also make smaller accessories to extend the capabilities of your exist
 
 
 ## Features:
+The following features are supported by the core software. 
+Select the features that you'd like to use by connecting the corresponding pins to your project.
+No need to recompile, just plug in and play.
+
 - One or two clock sources for either a direction conversion or superheterodyne radio.
 - **USB, LSB, CW, AM and digital modes.** Automatic IF shifting as required.
 - selection of up to 4 IF filters with user defined center frequencies, band widths and IF shifts.
@@ -59,10 +63,9 @@ Applicable schematics, gerber files and BOMs are included in this repository.
 Very tiny controller for a direct conversion or superheterodyne radio or a three frequency RF generator for your bench -
 ![Wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/very%20tiny/0905191316.jpg)
 
-Tiny radio , a good fit for a Forty-9er kit that adds a keyer and PC control.
+Tiny radio , a good fit for a Forty-9er kit that adds a keyer and a PC inteface .
 ![wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/tiny/1118191446.jpg)
 
 Not so tiny full features radio with supporting electronics -
-![wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/TRV2RC5.png)
-
-All supported by the same software without recompilation.
+![wiring](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/not%20tiny%20radio.jpg)
+All supported by the same software on the same processor.
