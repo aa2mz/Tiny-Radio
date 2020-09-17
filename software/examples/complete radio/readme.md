@@ -5,4 +5,4 @@ Such as uBitx or SSB6.1
 - Features:  Support direct conversion and superheterodyne radios.
 Filter selection, IF shift, Keyer, Dual VFOs, Icom 756Pro emulation.
 
-See documation directory for operating instructions.
+See documenation directory for operating instructions.
