@@ -357,6 +357,7 @@ int IcomCI_V:: splitCmd (unsigned char*cmd){
 }
 
 int IcomCI_V:: civ14Cmd( unsigned char*cmd) {
+#if 0
   // qqqqq might be able to do come of these
   switch (cmd[1]) {
     case 0x07 : // if shift 128 = 0 ;
@@ -377,8 +378,9 @@ int IcomCI_V:: civ14Cmd( unsigned char*cmd) {
     case 0x1a : // notch filter 0-255
       break;
     default:
-      okayCmd();
+      //okayCmd();
   }
+#endif
   okayCmd();
 }
 int IcomCI_V:: getID (unsigned char*cmd) {

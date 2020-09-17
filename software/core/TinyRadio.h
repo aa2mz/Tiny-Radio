@@ -55,7 +55,10 @@ public:
   int setBand (int b, int vno=0) ;
   long getFrequency (int vno=0)  ;
   long setFrequency (long f, int vno = 0) ;
-  int getIFShift(int cno=1) { return clockShift[cno];};
+  
+  int getIFShift(int cno=1) { // not persistent. Change IF filters in EPROM for permanent changes,
+      return clockShift[cno]; 
+  };
   int setIFShift(int ifs , int cno=1) { // clock 0 will be ignored
     clockShift[cno]=ifs;
     setClocks(); 
@@ -63,7 +66,7 @@ public:
   };
   int vfoSwap (void);
   int vfoBeqA (void);
-  int splitCmd (int son );
+  int splitCmd (int son = -1);
   int sendCW (char*) {};
   int pttCmd (int c);
   int getPtt (int c=0);
@@ -79,6 +82,7 @@ public:
   long  getBaud (void) { return getDictionary(D_BAUDRATE); } ;
   int setEPROM (int a, long v ) {} ;
   long getEprom(int a) {} ;
+  int pttIn(int p) {};
 }  ;
 
 CATRadio * TinyRadio:: setup( CATRadio* myGui) {
@@ -101,38 +105,53 @@ CATRadio * TinyRadio:: setup( CATRadio* myGui) {
 }
 
 int TinyRadio:: getMode (int vno=0) { 
-  return vfo[vno]. mode; 
+    return vfo[vno]. mode; 
   } ;
 int TinyRadio:: setMode (int m, int vno=0) { 
-  if(gui) gui->setMode(m,vno);
+  if (splitCmd()) vno = 1-vno;
   vfo[vno]. mode = m ; 
   setDictionary(D_VFOAMODE+2*vno,m); // qqqq implementation dependent
   setClocks(0);
+#ifdef TINYGUI
+  if(gui) gui->getMode(vno);
+#endif
   return ( m) ; 
 
   } ;
-int TinyRadio:: getFilter (int vno=0) { return vfo[vno]. filter ; } ;
+int TinyRadio:: getFilter (int vno=0) { 
+    return vfo[vno]. filter ; 
+  } ;
 int TinyRadio:: setFilter (int f, int vno=0)  { 
-  if(gui) gui->setFilter( f, vno) ;
-  return (vfo[vno]. filter=f); 
-};
+    //if(gui) gui->setFilter( f, vno) ;
+    return (vfo[vno]. filter=f); 
+  };
 // qqq have no idea what this is but need to select BPF and LPF
-int TinyRadio:: getBand (int vno=0){ return vfo[vno]. band;};
+int TinyRadio:: getBand (int vno=0){ 
+    return vfo[vno]. band;
+  };
 int TinyRadio:: setBand (int b, int vno=0) { 
-  if(gui) gui->setBand(b,vno);
-  return vfo[vno]. band=b;
-};
+    //if(gui) gui->setBand(b,vno);
+    return vfo[vno]. band=b;
+  };
 long TinyRadio:: getFrequency (int vno=0) { 
-  return vfo[vno]. frequency; 
+   return vfo[vno]. frequency; 
   } ;
 long TinyRadio:: setFrequency (long f, int vno = 0 ) { 
-  // "setClocks()" will tell gui what to show
-  vfo[vno]. frequency=f ;
-  setDictionary(D_VFOAFREQUENCY+vno*2, f) ; // qqqq apriori knowledge
-  setClocks(getPtt());
-  return ( f );
-} ;
+    // "setClocks()" will tell gui what to show
+    vfo[vno]. frequency=f ;
+#ifdef SAVEEEPROMWRITES
+    if ( vno != 0 ) 
+#endif
+      setDictionary(D_VFOAFREQUENCY+vno*2, f) ; // qqqq apriori knowledge
+    setClocks(getPtt()); // 
+  #ifdef TINYGUI
+    if (gui) gui->getFrequency(vno);
+  #endif
+    return ( f );
+  } ;
 int TinyRadio:: splitCmd (int son=-1 ) {
+  if  ( son == -1) 
+    return splitMode ;
   if ( son == 0 || son == 1 ) {
     splitMode = son ;
     if(gui) gui->splitCmd(son);
@@ -141,22 +160,21 @@ int TinyRadio:: splitCmd (int son=-1 ) {
 };
   
 int TinyRadio:: vfoSwap (void) {
-  long freq = getFrequency(0) ;
-  int mode = getMode(0) ;
-  int filter = vfo[0]. filter ;
-  int band = vfo[0]. band ;
+  long freq0 = getFrequency(0) ;
+  int mode0 = getMode(0) ;
+  //int filter0 = vfo[0]. filter ;
+  //int band0 = vfo[0]. band ;
   // ensure side effect occur()
     setFrequency ( getFrequency(1), 0) ;
-    setFrequency (freq, 1) ;
+    setFrequency (freq0, 1) ;
     setMode ( getMode(1), 0) ;
-    setMode (mode, 1) ;
-  vfo[0]. mode = vfo[1]. filter ;
-  vfo[1]. mode = filter ;
-  vfo[0]. mode = vfo[1]. band ;
-  vfo[1]. mode = band ;
-    setClocks(getPtt());
+    setMode (mode0, 1) ;
+  //vfo[0]. mode = vfo[1]. filter ;
+  //vfo[1]. mode = filter0 ;
+  //vfo[0]. mode = vfo[1]. band ;
+  //vfo[1]. mode = band0 ;
+  setClocks(getPtt());
   if(gui) gui->vfoSwap();
-
 }
 int TinyRadio:: vfoBeqA (void) {
   setFrequency ( getFrequency(0), 1) ;
@@ -171,16 +189,21 @@ int TinyRadio:: getPtt(int s=0) {   // also attenutator or antenna tuner or some
   else 
     return att ;
 }
+
 int TinyRadio:: pttCmd (int p) {
   ptt=p;
   radioPins.set(P_PTTOUT, p);
-  setClocks(p);   
+  setClocks(p); 
+  gui->getPtt(p);  
   return (ptt = p) ;
 }
 int TinyRadio:: attCmd (int a) {
-  if(gui) gui->attCmd(a);
+  //if(gui) gui->attCmd(a);
   return (att = a) ;
 } 
+/*
+ * Set the RF frequencies of Clk0, clk1 and clk2
+ */
 int TinyRadio:: setClocks(int p){
 // This has two behaviors if TINYRFTOOL is defined
 // Clocks 0 and 1 set in receive mode are stored
@@ -199,14 +222,14 @@ int TinyRadio:: setClocks(int p){
   long ifCenter = (getDictionary ( D_FILTER0LOW+ifSelect*2 ) 
         + getDictionary ( D_FILTER0HIGH+ifSelect*2 ))/2L ;
 
-  if(gui) gui->setFrequency( dialFrequency, 0 ); 
+  if ( radioType == RFTool && gui) gui->setFrequency( dialFrequency, 0 ); 
 
   if ( ifCenter == 0 ){ // direct conversion
     // do *not* use ifshift for frequency correction!
     radioClocks.setFrequency(dialFrequency, 0 );
     radioClocks.setFrequency(0L, 1 );
     
-    if(gui) gui->setFrequency( 0L, 1 );
+    //if(gui) gui->setFrequency( 0L, 1 );
     if ( radioType == RFTool ) { // then display clock 2
         radioClocks.setFrequency( getFrequency(splitMode)+getIFShift(2),2);         
         if(gui) gui->setFrequency( getFrequency(splitMode)+getIFShift(2), 2 );
@@ -225,10 +248,10 @@ int TinyRadio:: setClocks(int p){
       if(gui) gui->setFrequency(clk0,1);
       if(gui) gui->setFrequency(ifCenter,2);
     } else {
-      if(gui) gui->setFrequency(getFrequency(1-splitMode),1);
-      if(gui) gui->setFrequency(0,2);
+      //if(gui) gui->setFrequency(getFrequency(1-splitMode),1);
+      //if(gui) gui->setFrequency(0,2);
     }
   }
-  if(gui) gui->pttCmd(ptt);  
+  //if(gui) gui->getPtt(ptt);  
 
 }

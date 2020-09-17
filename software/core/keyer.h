@@ -62,10 +62,11 @@ public:
   int setPins( int dit, int dah = 0 , int rev = 0 ) {
     pinDot = (rev?dah:dit);
     pinDash = (rev?dit:dah);
+    // qqq duplication of RadioPins
     if (pinDot)  
-      pinMode(pinDot,INPUT_PULLUP);
+      //pinMode(pinDot,INPUT_PULLUP); 
     if (pinDash) {
-      pinMode(pinDash,INPUT_PULLUP);
+      //pinMode(pinDash,INPUT_PULLUP);
       keyerStyle = KEYERpaddle ;
     } else
       keyerStyle = KEYERstraight ;
@@ -84,9 +85,9 @@ public:
   }
   int readNow(int arg=0){
     int k = 0;
-    if ( pinDot && digitalRead(pinDot) == 0 ) 
+    if ( pinDot && radioPins.get(pinDot)  ) 
       k |= KEYdot ;
-    if ( pinDash && digitalRead(pinDash) == 0 )
+    if ( pinDash && radioPins.get(pinDash) )
       k |= KEYdash ;  
     return( k ) ;  
   }
@@ -132,15 +133,17 @@ class Keyer : public Taskable {
   int farnsworthMS = 92 ;
   int farnsworthExtra = 1020 ;
   int weightMS = 0 ;
-  
+  int practice = 0 ;
+    
   int keying ;
   int pinDot, pinDash;
-  int keyOUT = 13 ;
+  int keyOUT = P_CWOUT ;
   int keyerStyle ;
   int sideTone ;
   int sideTonePin ; // choice has side effects. See "tone()" for explain
 
   unsigned int elementHistory ;
+  CATRadio * keyCmdr;
 
   int element() { // only Farnsworth timing if sending text2CW
 #ifdef TEXT2CW
@@ -168,7 +171,7 @@ class Keyer : public Taskable {
     return codeKey.read();
   }
   int setCW (int on) {
-    digitalWrite(keyOUT,on);
+    if ( !practice) radioPins.set(P_CWOUT,on);
     if (sideTone > 0 ) {
       if (on)
         tone(sideTonePin,sideTone);
@@ -242,6 +245,11 @@ public:
     text2CW.setup(s) ;
   }
 #endif
+  int practiceMode(int p) {
+    int priorMode = practice ;
+    practice = p;
+    return priorMode ;
+  }
   
   int loop(int arg) {
 #ifdef TEXT2CW
@@ -250,12 +258,15 @@ public:
 #endif
     if (keyerStyle == KEYERpaddle)
       return paddleLoop ();
+#ifdef KEYERSTRAIGHTKEY
     if (keyerStyle == KEYERstraighter)
       return straighterLoop();
     else
       return straightLoop ();
+#endif
   }
 private:  
+#ifdef TEXT2CW
   int textLoop(int arg=0 ) {
     static int needRead = 1;
     static int k;
@@ -282,25 +293,27 @@ private:
         k = KEYup;
         break;
       case KEYchar:
-        keyCmdr.push(elementHistory) ;
+        if (keyCmdr) keyCmdr->push(elementHistory) ;
         setup( element()*3+farnsworth());
         elementHistory = 0 ;
         needRead = 1 ;
         break ;
       case KEYword:
         setCW(0);
-        keyCmdr.push(0);
+        if (keyCmdr) keyCmdr->push(0);
         elementHistory = 0 ;
         setup( element()*7+2*farnsworth());
         needRead = 1 ;
         break ;
       case KEYnone: // not here!!!
         setCW(0);
-        keyCmdr.push(0);
+        if (keyCmdr) keyCmdr->push(0);
         elementHistory = 0 ;
         return;
     }
   }
+#endif
+#ifdef KEYERSTRAIGHTKEY
   int straightLoop () {
     static int lastKey = KEYnone ;
     int k = getKey();
@@ -342,6 +355,7 @@ private:
     }
     lastKey = k;
   }
+#endif
   int paddleLoop() {
     int k ;
 static int firstIdle ;
@@ -358,7 +372,7 @@ static int firstIdle ;
         } else {  // stay idle
           state = KSidle ;
           if (firstIdle == 1 ) {
-            keyCmdr.push(elementHistory) ; // send a space to end the word
+            if (keyCmdr) keyCmdr->push(elementHistory) ; // send a space to end the word
             elementHistory = 0 ; // start new word
             firstIdle = 0 ;
           }
@@ -368,18 +382,19 @@ static int firstIdle ;
       case KScharWAIT :
         if (k == KEYnone ) { // wait for a new word
           // call the character handler
-          keyCmdr.push(elementHistory) ; // decode the first char in a word
+          if (keyCmdr) keyCmdr->push(elementHistory) ; // decode the first char in a word
           elementHistory = 0 ; 
           state = KSidle ;
-          setup(element()*4+farnsworth()) ; // have alread waited 3 of 7 elementMSs
+//          setup(element()*4+farnsworth()) ; // have alread waited 3 of 7 elementMSs
+          setup(element()*4) ; // have alread waited 3 of 7 elementMSs
           return;
         } else if ( k & KEYdash ) {   // priority to dash so N's and C's start before A's
-          keyCmdr.push(elementHistory) ; // start a second or later char in the same word
+          if (keyCmdr) keyCmdr->push(elementHistory) ; // start a second or later char in the same word
           elementHistory = 0 ; 
           dashON();
           return ;
         } else if ( k & KEYdot ) {
-          keyCmdr.push(elementHistory) ; // start a second or later char in the same word
+          if (keyCmdr) keyCmdr->push(elementHistory) ; // start a second or later char in the same word
           elementHistory = 0 ; 
           dotON() ;
           return ;
@@ -400,7 +415,8 @@ static int firstIdle ;
       case KSdotAFTER :
         if (k == KEYnone ) {
           state = KScharWAIT ;
-          setup(element()*2+farnsworth()); // have alread waited once
+//          setup(element()*2+farnsworth()); // have alread waited once
+          setup(element()*2); // have alread waited once
         } else if ( k & KEYdash ) {   // priority to dash so dots and dashes alternate
           dashON();
         } else if ( k & KEYdot ) {
@@ -420,7 +436,8 @@ static int firstIdle ;
         return ;
       case KSdashAFTER :
         if (k == KEYnone ) {
-          setup(element()*2+farnsworth()); // have alread waited once
+//          setup(element()*2+farnsworth()); // have alread waited once
+          setup(element()*2); // have alread waited once
           state = KScharWAIT ;
         } else if ( k & KEYdot )    // priority to dit so dits and dahs alternate
           dotON() ;

@@ -35,29 +35,29 @@
  * Superscripts are 1 column wide. Normal characters are 2 columns wide.
  */
 class Graphics  {
-//  int pause ;
+  int paused ;
 public:
   virtual void init(int rotation) = 0 ;
 //  virtual int loop (int arg = 0 ) = 0 ; 
   virtual void startBlink(int brow, int bcol, int nchar,  int bType, int bduty, int bperiod=5) = 0 ;
   virtual void stopBlink() = 0 ; 
-//  pauseBlink() {pause = 1 ;};
-//  resumeBlink(){pause = 0 ;};
+  pauseBlink() {paused = 1 ;};
+  resumeBlink(){paused = 0 ;};
   virtual void eraseLine(int row )=0 ;   
 //  void eraseLine(int row ){ eraseEOL(row,0) ;} ;   
   virtual void eraseEOL(int row, int col) = 0 ;
   virtual void writeString( int row, int col, unsigned char* s, int font=SIZE2 ) = 0 ;
   virtual void writeMixedSize(int row, int col, unsigned char* s ) = 0 ;
-  virtual void writeChar( int row, int col, unsigned char c, int bInvert, int font = SIZE2) = 0 ;
+  virtual void writeChar( int row, int col, unsigned char c, int color, int font = SIZE2) = 0 ;
 };
 //class OledGraphics : public Graphics, public Taskable {
 class OledGraphics :  public Taskable {
   int lastRow;
-  unsigned char screen[4][17]; 
   // blink period is typically 4 and duty 1 or 3
   // blinks look better with more on-time than off.
   int brow, bcol, nchar, bType, btime; 
   int  bperiod ,  bduty;   
+  int paused ;
   int prow, pcol, rrow, rcol ;
   void blink(int how) {
     int c , size ;
@@ -89,21 +89,28 @@ class OledGraphics :  public Taskable {
   } ;  
 
 public:
+  unsigned char screen[4][17]; // QQQ
 
-  setup(int ms = 200) {
+  setup(int ms = 40) { // want low-ish to be responsive, use larger time and duty to call to 200
     Taskable :: setup ( ms);
     bperiod = 0 ;
   }
   void startBlink(int brow, int bcol, int nchar,  int bType, int bduty, int bperiod=5) {
+    stopBlink();
     this->brow=brow;  // 0-3
     this->bcol=bcol;  // 0-15
     this->nchar=nchar;
     this->bType=bType;
     this->bperiod=bperiod;
     this->bduty=bduty;
-    btime = 0 ;
+    btime = bduty ;
   }
+  pauseBlink() {paused = 1 ;};
+  resumeBlink(){paused = 0 ;};
+  
   int loop(int arg=0) {
+    if ( paused ) 
+      return ;
     if ( bperiod == 0 )
       return ;
     btime ++ ; 
@@ -119,12 +126,12 @@ public:
     if ( btime < bduty) {
       blink(BLINKRESTORE);
     }
+    paused = 0;
     bperiod = 0 ;
   }; 
-  pauseBlink() {};
-  resumeBlink(){};
   void eraseScreen( int invert=0) {
-    memset(screen, sizeof(screen), ' ');
+    stopBlink();
+    memset(screen, ' ', sizeof(screen));
     oledFill(invert, 1);  
   };
   void eraseLine(int row ){
@@ -143,9 +150,9 @@ public:
   // qqqq not working with literal strings, use writeMixedSize() instead
   void writeString( int row, int col, unsigned char* s, int font=SIZE2 ){
 //Serial.println((char*)s);
-    int i; 
+    int i=0; 
     unsigned char p[17];
-    while (s && *s ) {
+    while (s && *s && i<16) {
       if ( font==SIZE2)
         p[i] = *s & 0x7fu ;
       else
@@ -169,30 +176,35 @@ public:
         c = ' ' | 0x80u;
         size = 1;
       }
-      if ( screen[row][col] != c ) { // update the display
-        writeChar(row,col, c, 0, ((size==1)?SIZE1:SIZE2) );
+      if ( screen[row][col] != c ) { // wont work to erase inversion
+        writeChar(row,col, c, COLORWB, ((size==1)?SIZE1:SIZE2) );
+//Serial.print( (char) (c&0x7f) );
       }    
       col += size;
       s++;
     }
+//Serial.println("<oled");
   } ;
   
-  void writeChar( int row, int col, unsigned char c, int bInvert, int font = SIZE2){
+  void writeChar( int row, int col, unsigned char c, int color, int font = SIZE2){
     char s[2];
     s[0]= c & 0x7f ; // make sure character isn't fu'ed
     s[1] = 0 ;
+    color = 0 ;
 //Serial.println((char*)s);
     if ( font == SIZE2) {
-      oledWriteStringStretched( 0, col*8, row*2, (char*)s, bInvert, 1);
+      oledWriteStringStretched( 0, col*8, row*2, (char*)s, color, 1);
       screen[row][col] = (c & 0x7fu) ;      
       screen[row][col+1] = (c & 0x7fu ) ; // qqqqq it'll be okay if were are consistant ???     
     } else { 
-      oledWriteStringNormal   ( 0, col*8, row*2, (char*)s, bInvert, 1);
+      oledWriteStringNormal   ( 0, col*8, row*2, (char*)s, color, 1);
       s[0]=' '; s[1]=0;
-      oledWriteStringNormal   ( 0, col*8, row*2+1, (char*)s, bInvert, 1);
+      oledWriteStringNormal   ( 0, col*8, row*2+1, (char*)s, color, 1);
       screen[row][col] = (c | 0x80u) ;     
     }   
   } 
+// don't use the typewriter for TinyGui
+#ifndef TINYGUI
   int type(int c, int row, int size = SIZE2 ) {
     // advance to next position
     int w = ((size==SIZE1)?1:2) ;
@@ -254,7 +266,7 @@ public:
     }
     eraseLine(3);
   }
-  
+#endif
   void init (int rotation = 0) {     // 0 = rotatee 0 degrees, 1 == rotate 180
     bperiod = 0;
     setup(200);
@@ -276,10 +288,9 @@ public:
         delay(1000);
 #endif
 //          oledFill(0, 1);
-        eraseScreen();
-        oledWriteStringStretched( 0, 4, 4, pgm2string(S_WELCOME), 0, 1);
-        oledWriteStringNormal( 0, 0, 7, pgm2string(TD_COPYRIGHT), 0, 1);
-        delay(800);
+//        eraseScreen();
+//        oled.writeString(0,0,pgm2string( S_Init));
+//        delay(1000);
         eraseScreen();
     }
   } ;

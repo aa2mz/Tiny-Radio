@@ -173,12 +173,13 @@ int getTwoLong(char* s, long* first, long* second){
 }
 
 // qqq move to progmem
-char *Mode_Chars = "LUACDF_RY123" ;
+//char *Mode_Chars = "LUACDF_RY123" ;
 // I wish I knew how to do templates
 int TextCAT:: getMode(void) { // M
   int m = radio->getMode() ;
   cmd[0] += 32 ;
   cmd[1] = Mode_Chars[m];
+  cmd[1] = pgm2string(S_MODES)[m]
   cmd[2] = 0 ;
   serial->println((char*)cmd);
 }
@@ -295,7 +296,7 @@ int  TextCAT:: setEProm (void) {
   qAddress = addr;
   qValue = value;
   serial->print("# ");
-  serial->print(qAddress); serial->print(" "); serial->print(dictName(qAddress));
+  serial->print(qAddress); serial->print(" "); serial->print(dictionaryName(qAddress));
   serial->print(" = ") ; serial->print(qValue) ; serial->println(" ?");
   qState = 2;
 }
@@ -310,7 +311,7 @@ int  TextCAT:: getEProm(void) {
   for (addr = start ; addr < end ; addr ++ ) {
     serial->print("e");
     serial->print(addr); serial->print("[ ");
-    serial->print (dictName(addr));
+    serial->print (dictionaryName(addr));
     serial->print (" = ]") ;
     if ( addr == D_COPYRIGHT )
       serial->println( getDictionary(addr),HEX) ;

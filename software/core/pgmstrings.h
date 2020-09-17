@@ -20,9 +20,10 @@ const char S_SPACES8[] PROGMEM="        ";
 const char S_WELCOME[] PROGMEM="Welcome" ;
 const char S_TUNE[] PROGMEM ="Tune";
 const char S_BY[] PROGMEM="by"; 
+const char S_STEP[] PROGMEM = "Step " ;
 const char S_SPLIT[] PROGMEM ="Split";
-const char S_TXB[] PROGMEM="TX=B"; 
-const char S_ON[] PROGMEM="On "; 
+const char S_TXB[] PROGMEM="TX B"; 
+const char S_ON[] PROGMEM= "On "; 
 const char S_OFF[] PROGMEM="Off"; 
 const char S_SWEEP[] PROGMEM="Sweep"; 
 const char S_TRACK[] PROGMEM="Track"; 
@@ -33,7 +34,12 @@ const char S_BADVALUE[] PROGMEM="!Bad value";
 const char S_TRANSMIT[] PROGMEM="Transmit"; 
 const char S_RECEIVE_[] PROGMEM="Receive "; 
 const char S_TOOFAST[] PROGMEM="!Too fast";
-
+const char S_RESET[] PROGMEM="Reset";
+const char S_Init[] PROGMEM="Init...";
+const char S_MODES[] PROGMEM="LUACDF_RY123"; 
+const char S_CLOCK12[] PROGMEM="IF Shift"; 
+const char S_TX[] PROGMEM="Tx";
+const char S_RX[] PROGMEM="Rx";
 //const char S_[] PROGMEM=""; 
 
 // you need to have a generally available buffer *somewhere*

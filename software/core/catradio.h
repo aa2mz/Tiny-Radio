@@ -81,4 +81,5 @@ class CATRadio {  // inherit from class and implement all methods
   virtual int attCmd (int c) = 0 ;
   virtual int getSMeter(void) = 0 ;
   virtual int nakCmd (char*) = 0 ;
+  int push(int) {};
 }  ;

@@ -329,8 +329,8 @@ void dictionaryDefault(void)
  * Value are 5 volts scaled to A2D values 0 - 1023 
  * using a 4.7K pullup to a 10K and 2.2K pulldown
  */
-  setDictionary(D_CWAKEYBOTH, 325) ;
-  setDictionary(D_CWAKEYDOT, 450) ;
+  setDictionary(D_CWAKEYBOTH, 288) ;
+  setDictionary(D_CWAKEYDOT, 550) ;
   setDictionary(D_CWAKEYDASH, 800) ;
   
   setDictionary(D_FILTER0LOW, 0L); // change for AM, setting used for DC and RFT00L
@@ -449,7 +449,7 @@ void setDictionary(int addr, long word)
 #endif
 }
 
-char* dictName(int i) 
+char* dictionaryName(int i) 
 {
   PGM_P dict;
   if ( i < D_NUMDICT ) {

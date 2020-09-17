@@ -57,7 +57,11 @@ If TINYRFTOOL is defined, the definition for the analog pins change.
 #define P_CWOUT 13
 #define P_LED0 13
 
+// analog key
 #define P_KEYERIN A0
+// dot and dash are active low, modify PinSetLogic to match
+#define P_KEYERDOT 0
+#define P_KEYERDASH 0
 
 // IF filters are defined by mode, not user selected otherwise  
 // 0 = AM
@@ -89,21 +93,22 @@ If TINYRFTOOL is defined, the definition for the analog pins change.
 #define P_SDA A5
 
 // active logic level right to left
-//                           Analog  Digital
-//                           76xx3210321098765432xx
-unsigned long PinSetLogic = 0b0000011010001111111100ul ;
+//                           Analog   Digital
+//                            76xx3210321098765432xx
+unsigned long PinSetLogic = 0b0000011010001011111100ul ;
 //                            AA..AooAoIIIoIoooooo..
-#define PINSETLOGIC(p) ((PinSetLogic>>(p))& 0xfffeul)
-
-class RadioPins : public Taskable {
+//#define PINSETLOGIC(p) ((PinSetLogic>>((unsigned long)p)) & 0xfffffffeul)
+#define PINSETLOGIC(p) (bitRead(PinSetLogic,p))
+class RadioPins : protected Taskable {
   int pin;
   long maxTXtime=0 ;  /// qqqq not implemented
   int level ;
 public:
   long hangTime=1600 ;
+  long timeRemaining ;
   PinSet () {
     init();
-    setup(1600); // this is used for CW hang time if not QSK  
+    setup(10); // this is used for CW hang time if not QSK  
   }
   int set(int p, int val) {
     if (p) 
@@ -118,15 +123,8 @@ public:
     Taskable:: setup (arg) ;
   }
   int restart() {
-    setup(hangTime);
-  }
-  int loop ( int arg = 0) {
-    if ( get(P_PTTIN ))  { // if user has PPT pushed, ignore CW hangtime
-      hangTime = 0 ;
-    }
-    if ( hangTime > 0 ) {
-      set(P_PTTOUT, 0) ;
-    }
+    timeRemaining = hangTime ;
+    //setup(hangTime);
   }
 
   int init() {
@@ -135,7 +133,9 @@ public:
     if ( P_ENCODERA) pinMode ( P_ENCODERA, INPUT_PULLUP) ;
     if ( P_ENCODERB) pinMode ( P_ENCODERB, INPUT_PULLUP) ;
 //    if ( P_KEYERIN) pinMode ( P_KEYERIN, INPUT) ;
-    if ( P_KEYERIN) pinMode ( P_KEYERIN, INPUT_PULLUP) ; // qqq temp test on bare Nano
+    if ( P_KEYERIN) pinMode ( P_KEYERIN, INPUT) ; // qqq INPUT_PULLUP to test on bare Nano
+    if ( P_KEYERDOT) pinMode ( P_KEYERDOT, INPUT_PULLUP) ; 
+    if ( P_KEYERDASH) pinMode ( P_KEYERDASH, INPUT_PULLUP) ; 
     if ( P_BPF0) pinMode (P_BPF0, OUTPUT);
     if ( P_BPF1) pinMode (P_BPF1, OUTPUT);
     if ( P_BPF2) pinMode (P_BPF2, OUTPUT);
@@ -145,8 +145,10 @@ public:
     if ( P_SIDETONE) pinMode (P_SIDETONE, OUTPUT) ;
     if ( P_IFF0) pinMode (P_IFF0, OUTPUT);
     if ( P_IFF1) pinMode (P_IFF1, OUTPUT);
-    if ( P_PTTIN) pinMode (P_PTTIN, INPUT );
+    if ( P_PTTIN) pinMode (P_PTTIN, INPUT_PULLUP );
     if ( P_PTTOUT) pinMode (P_PTTOUT, OUTPUT);
+    if ( P_CWOUT) pinMode (P_CWOUT, OUTPUT);
+    if ( P_LED0) pinMode (P_LED0, OUTPUT);
     if ( P_GROUND) { 
       pinMode (P_GROUND, OUTPUT);
       digitalWrite(P_GROUND,0);
@@ -217,11 +219,25 @@ public:
     if (hangTime > 0 )
       setup(hangTime);
   }
+  int loop ( int arg = 0) {
+    if ( get(P_PTTIN ))  { // if user has PPT pushed, ignore CW hangtime
+      //radio.pttIn(1); // radio is controlled in TinyGui
+      timeRemaining = hangTime  ;
+    } else {
+      //radio.pttIn(0);
+      timeRemaining -= interval ;
+    }
+    if ( timeRemaining <= 0 ) {
+      set(P_PTTOUT, 0) ;
+      timeRemaining = 0 ;
+    }
+  }
 
 } radioPins ;
 
 #ifdef TINYGUI
-ButtonTask encoderButton(10); // built into the encoder
+// button and encoder tasks are defined in helpers.h
+ButtonTask button(10); // built into the encoder
 //ButtonTask ShiftButton(9);  // perhaps on another encoder ...
 // Class support for three encoders available on [8,9] [12,11] and [10,13]
 //static int EncoderPinA[3] = {8,12, 10};
@@ -231,7 +247,7 @@ static int EncoderPinA[3] = {0,3, 2};
 static int EncoderPinB[3] = {1,4, 5};
 EncoderTask bigKnob(11,12); // for default GUI, create encoder "bigknob" on pins 10,11
 // static member initializer for EncoderTask 
-EncoderTask *Encoders[3] = {0, &bigknob, 0} ; // helper for interupt handler
+EncoderTask *Encoders[3] = {0, &bigKnob, 0} ; // helper for interupt handler
 #endif
 
 // reset is needed to use changed setup values
