@@ -85,4 +85,4 @@ Resart Required
 to remind you that most changes only take effect
 when the Tiny Radio is first powered on.
 Each configuration value is documented in the
-[Text Commands Manual](Text_Commands.md)
+![Text Commands Manual](Text_Commands.md)
