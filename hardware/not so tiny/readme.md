@@ -17,7 +17,31 @@ although the sense of the level knob is backwards. (Clockwise reduces the level.
 I will implement programable hang-time in software.
   - Oh, look! The "ground" on the right side of S-Meter isn't connected to ground. 
   A short jumper from the bottom of  SD1  top the left of AD4 fixes this.
-- Testing next: S-Meter.
+- Testing the S-Meter - 
+An input of about 100 mV p-p results in an S-Meter circuit of about 4.0 volts DC out.
+Using a definition of S9+40 = 5mV RMS (at the antenna) and assuming that the S-Meter amplifier is linear,
+the voltage needs to be devided by by 800 to be converted to the readings in the S-Meter to Voltage table.
+Out 10 bit A2D converter doesn't have enough resolution.
+Let's set is up so that S9+20 = 4 volts then dividing .5 mV by 1000 , 
+the A2D converter should start responding at about S2... good enough for even quiet bands.
+A band with S5 noise should be well withing resolution of the A2D converter.
+
+```
+S9 + 40 dB	5.0 mV
+S9 + 30 dB	1.6 mV
+S9 + 20 dB	0.50 mV
+S9 + 10 dB	0.16 mV
+S9	        50 µV
+S8	        25 µV
+S7	        12.6 µV
+S6	        6.3 µV
+S5	        3.2 µV
+S4	        1.6 µV
+S3	        800 nV
+S2	        400 nV
+S1	        200 nV
+```
+There's about 1 second of hysterisis in the circuit.
 
 This level of hardware development adds features to support a more complete radio build
 such as an UBitx or SSB6.1 transciever.
