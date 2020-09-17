@@ -1,6 +1,12 @@
 # Text Based Serial Protocol
 
-Text based serial protocol is used to configure your tiny radio. 
+Text based serial protocol is used to configure your tiny radio if your build does not have a display. 
+If your radio does have a display, it will have a configuration screen used to accomplish the same thing.
+
+The text-based serial interface also provides access to operational controls 
+such as changing the frequency , activating the PTT and sending CW 
+with the text-to-CW capability of the keyer.
+
 It is activated by default by the initial flash of the program or 
 or for the first two seconds when the processor is first powered on. 
 (Enter at least four "b"s on the serial terminal to force change to text mode.)
