@@ -45,10 +45,44 @@ Pressing the button will end *Change mode* and revert to *Select mode".
 
 1.  ````_7.040.00 C```` ````VFO A and mode character````
 Within numbers, underscore charactors are used instead of leading spaces.
-2.  ````14.310.00 U  ---   VFO B and mode character````
-Hightlighting line two will swap VFOs
-3. ````Step 1.0 B=A  ---   tuning step and VFO equalizer````
-Highlighting Step and pressing the button will cycle between 1.0 2.5 and 5.
-4. ````Tx=A  Rx   *  ---   Split mode, Rx/Tx indicator and page turner````
-Highlight TX=A and press the button to change it to TX=B.
+You can turn the knob to select a digit or signal mode character.
+Pressing the button will enter *change mode* and then you can change a value.
+While in *select mode* moving to the right of line will andvance the blink to line two.
+Moving the left of the line will advance the blink to line four.
+2.  ````14.310.00 U```` ````VFO B and mode character````
+Pressing the button while line two is blinking will swap VFOs
+Turning the knob to the left will move the blink to line one;
+turning the knob to the right will move the blink to line three.
+3. ````Step 1.0 B=A```` ````tuning step and VFO equalizer````
+Highlighting ````Step 1.0```` and pressing the button will cycle between 1.0 2.5 and 5.
+````Step 2.5```` is a nice step on a crowded sideband band.
+The *step value* will be used when tuning VFOA.
+Turning the knob to the left will move the highlight to line two; 
+to the right will highligh ````B=A````. 
+Pressing the button while ````B=A```` is highlighted will make VFOB the same as VFOB.
+4. ````Tx=A  Rx   *```` ````Split mode, Rx/Tx indicator and page turner````
+Highlight TX=A and press the button to change it to TX=B. 
+This is used either for split operation or to use VFO as an RIT frequency.
+````Rx```` changes to ````Tx```` then the radio is transmitting.
+Selecting ````*```` and pressing the button will change to screen two.
 
+## Screen 2, Line by Line
+````
+IF Shift
+_____000
+_____000
+       *
+````
+## Screen 3, Line by Line
+Configuration screen
+````
+Baud Rate
+____38.400
+Resart Required
+              *
+```              
+"Restart required" appears if you change a value 
+to remind you that most changes only take effect
+when the Tiny Radio is first powered on.
+Each configuration value is documented in the
+[Text Commands Manual](Text_Commands.md)
