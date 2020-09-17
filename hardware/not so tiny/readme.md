@@ -1,6 +1,6 @@
 # not so tiny radio
 
-**Caution! This hardware is under delopment, untested and might not work!**
+**Notice! This hardware is under delopment. The hardware is mostly working with two relatively easy fixes required so far. See below.**
 
 Update. Testing so far: 
 - Software: The digital core and software works. 
@@ -11,11 +11,13 @@ Update. Testing so far:
 Soldering a discrete capacitor and resistor to the tip if the mic plugs gets
 the microphone preamp working nicely. 
 I sub'ed a 1.5K resistor for ISR2.
+![project case](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/Screenshot_20200917-111255_Photos.jpg)
 With that fix and the input select switch and level control gets a nice 2v p-p signal or less out of the input select header;
 although the sense of the level knob is backwards. (Clockwise reduces the level.)
   - The audio VOX works in full QSK/full breaking but I expected there to be some hang time.
 I will implement programable hang-time in software.
   - Oh, look! The "ground" on the right side of S-Meter isn't connected to ground. 
+  ![project case](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/Screenshot_20200917-111021_Photos.jpg)
   A short jumper from the bottom of  SD1  top the left of AD4 fixes this.
 - Testing the S-Meter - 
 An input of about 100 mV p-p results in an S-Meter circuit of about 4.0 volts DC out.
@@ -25,7 +27,6 @@ Out 10 bit A2D converter doesn't have enough resolution.
 Let's set is up so that S9+20 = 4 volts then dividing .5 mV by 1000 , 
 the A2D converter should start responding at about S2... good enough for even quiet bands.
 A band with S5 noise should be well withing resolution of the A2D converter.
-
 ```
 S9 + 40 dB	5.0 mV
 S9 + 30 dB	1.6 mV
@@ -42,6 +43,7 @@ S2	        400 nV
 S1	        200 nV
 ```
 There's about 1 second of hysterisis in the circuit.
+- Still to do: Relays, line decoders, BCI HPF
 
 This level of hardware development adds features to support a more complete radio build
 such as an UBitx or SSB6.1 transciever.
