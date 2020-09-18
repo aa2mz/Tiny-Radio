@@ -360,7 +360,9 @@ int TextCAT::  setWPM(void) { // some whacky rationalizations here
     setDictionary(D_CWWPM, wpm);
     setDictionary(D_CWFARNSWORTH, charRate);        
 
+#ifdef TINYKEYER
     keyer.setWPM(wpm, charRate);     // qqq embarassing global variable
+#endif
     Serial.print("C ");
     Serial.print(wpm);
     Serial.print(' ');
