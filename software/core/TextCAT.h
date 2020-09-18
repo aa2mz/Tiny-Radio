@@ -178,8 +178,8 @@ int getTwoLong(char* s, long* first, long* second){
 int TextCAT:: getMode(void) { // M
   int m = radio->getMode() ;
   cmd[0] += 32 ;
-  cmd[1] = Mode_Chars[m];
-  cmd[1] = pgm2string(S_MODES)[m]
+//  cmd[1] = Mode_Chars[m];
+  cmd[1] = pgm2string(S_MODES)[m];
   cmd[2] = 0 ;
   serial->println((char*)cmd);
 }
@@ -190,10 +190,11 @@ int TextCAT:: setMode(void)  { // m
     return;
   }
   int i,m ;
-  for (i = 0 ; i < strlen(Mode_Chars) ; i++ )
-    if (cmd[1] == Mode_Chars[i] ) 
+  pgm2string(S_MODES);
+  for (i = 0 ; i < strlen(buffer) ; i++ )
+    if (cmd[1] == buffer[i] ) 
       break;
-  if ( i == strlen(Mode_Chars)) {
+  if ( i == strlen(buffer)) {
     serial->println("! Bad mode");
     return 0;
   }

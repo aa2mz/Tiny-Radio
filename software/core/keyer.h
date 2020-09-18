@@ -143,7 +143,7 @@ class Keyer : public Taskable {
   int sideTonePin ; // choice has side effects. See "tone()" for explain
 
   unsigned int elementHistory ;
-  CATRadio * keyCmdr;
+//  CATRadio * keyCmdr;
 
   int element() { // only Farnsworth timing if sending text2CW
 #ifdef TEXT2CW
@@ -258,15 +258,12 @@ public:
 #endif
     if (keyerStyle == KEYERpaddle)
       return paddleLoop ();
-#ifdef KEYERSTRAIGHTKEY
     if (keyerStyle == KEYERstraighter)
       return straighterLoop();
     else
       return straightLoop ();
-#endif
   }
 private:  
-#ifdef TEXT2CW
   int textLoop(int arg=0 ) {
     static int needRead = 1;
     static int k;
@@ -312,8 +309,6 @@ private:
         return;
     }
   }
-#endif
-#ifdef KEYERSTRAIGHTKEY
   int straightLoop () {
     static int lastKey = KEYnone ;
     int k = getKey();
@@ -355,7 +350,6 @@ private:
     }
     lastKey = k;
   }
-#endif
   int paddleLoop() {
     int k ;
 static int firstIdle ;
@@ -385,8 +379,7 @@ static int firstIdle ;
           if (keyCmdr) keyCmdr->push(elementHistory) ; // decode the first char in a word
           elementHistory = 0 ; 
           state = KSidle ;
-//          setup(element()*4+farnsworth()) ; // have alread waited 3 of 7 elementMSs
-          setup(element()*4) ; // have alread waited 3 of 7 elementMSs
+          setup(element()*4+farnsworth()) ; // have alread waited 3 of 7 elementMSs
           return;
         } else if ( k & KEYdash ) {   // priority to dash so N's and C's start before A's
           if (keyCmdr) keyCmdr->push(elementHistory) ; // start a second or later char in the same word
@@ -415,8 +408,7 @@ static int firstIdle ;
       case KSdotAFTER :
         if (k == KEYnone ) {
           state = KScharWAIT ;
-//          setup(element()*2+farnsworth()); // have alread waited once
-          setup(element()*2); // have alread waited once
+          setup(element()*2+farnsworth()); // have alread waited once
         } else if ( k & KEYdash ) {   // priority to dash so dots and dashes alternate
           dashON();
         } else if ( k & KEYdot ) {
@@ -436,8 +428,7 @@ static int firstIdle ;
         return ;
       case KSdashAFTER :
         if (k == KEYnone ) {
-//          setup(element()*2+farnsworth()); // have alread waited once
-          setup(element()*2); // have alread waited once
+          setup(element()*2+farnsworth()); // have alread waited once
           state = KScharWAIT ;
         } else if ( k & KEYdot )    // priority to dit so dits and dahs alternate
           dotON() ;
