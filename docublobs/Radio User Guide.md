@@ -30,6 +30,8 @@ If the press is longer that one second, it will consider to be a "long press."
 Step 1.0 B=A     tuning step and VFO equalizer
 Tx=A  Rx   *     Split mode, Rx/Tx indicator and page turner
 ````
+Effect of *long-press:* Cycle the value of *step.*
+
 Something is always blinking on the Tiny Radio display
 and there are two kinds if blinks.
 - Inverted blink: *"Select" mode.* Characters are alternately displayed as white on black and black on white.
@@ -67,20 +69,35 @@ This is used either for split operation or to use VFO as an RIT frequency.
 Selecting ````*```` and pressing the button will change to screen two.
 
 ## Screen 2, Line by Line
+Screen two enables relative changes to the IF clock and the utility clock.
 ````
-IF Shift
-_____000
-_____000
-       *
+Display       Comment
+IF Shift      Title
+____.000      IF (clk1) shift
+____.000      Utility (clk2) shift
+       *      Advance to screen 3
 ````
+Effect of *long-press:* Return to screen 1.
+
+
+Select the IF on line 2 or the utility clock on line 3. 
+If you have a direct conversion radio, there is no intermediate frequency and line 2 will be blank.
+Each click on knob will add or subtract 50 Hz to the selected frequency. 
+The software automatically computes the LO and IF frequencies (on clk0 and clk1.)
+It is an operating technique to vary the IF slightly to reduce interference from operators on nearby frequencies. 
+*If enabled in EPROM,* clk2 will be output the dial frequency plus or minus the amount displayed on line 3.
+Example uses of clk3 include sending it into the radio to help align your filters, an RF generator for your bench or as a low power input to your antenna for checking SWR.
 ## Screen 3, Line by Line
 Configuration screen
 ````
-Baud Rate
-____38.400
-Resart Required
-              *
-```              
+Display            Comment
+Baud Rate          Text description of EPROM setting
+____38.400         Value of EPROM setting
+Resart Required    Indication the effects of changes are not immediate
+              *    Change to screen 1
+```     
+Effect of *long-press:* Return to screen 1.
+
 "Restart required" appears if you change a value 
 to remind you that most changes only take effect
 when the Tiny Radio is first powered on.
