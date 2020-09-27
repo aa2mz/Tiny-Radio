@@ -17,6 +17,7 @@ Megahertz are sounded and modified with the 'B' command.
 Kilohertz are sounded and modified with the 'F' command.
 Fine tuning is sounded and modified by the '.' command. 
 (The '.' command can be shortened to 'A' or 'N'.)
+Keying an 'R' will result in the radio sounding the megahertz and kilohertz values.
 ## Enter Command Mode
 If your radio has a button on it, push the button.
 If not, key six dashes. "------"
@@ -61,3 +62,5 @@ Press the button again or key six dashes "------" to exit command mode.
 If so, the TextRemote protocol will allow you to control your radio. 
 You will need to download one of the available USB terminal programs to your phone to establish the connection.
 # 3. Hardware Mods
+![mods](https://github.com/aa2mz/Tiny-Radio/blob/master/software/examples/els9er/aa2mz-DSB-49er.jpg)
+
