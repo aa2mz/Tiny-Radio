@@ -139,12 +139,9 @@ long TinyRadio:: getFrequency (int vno=0) {
 long TinyRadio:: setFrequency (long f, int vno = 0 ) { 
     // "setClocks()" will tell gui what to show
     vfo[vno]. frequency=f ;
-#ifdef SAVEEEPROMWRITES
-    if ( vno != 0 ) 
-#endif
-      setDictionary(D_VFOAFREQUENCY+vno*2, f) ; // qqqq apriori knowledge
+    setDictionary(D_VFOAFREQUENCY+vno*2, f) ; // qqqq apriori knowledge
     setClocks(getPtt()); // 
-  #ifdef TINYGUI
+  #ifdef GUI
     if (gui) gui->getFrequency(vno);
   #endif
     return ( f );

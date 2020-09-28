@@ -32,15 +32,12 @@
     A4-A5 - I2C display/si5351
     A6    - Power or ground pin for the OLED
     A7    - Power or ground pin for the OLED
-
 If TINYRFTOOL is defined, the definition for the analog pins change.  
-
 */
 // eight bandpass filters
 #define P_BPF0 2
 #define P_BPF1 3
 #define P_BPF2 4
-
 // four lowpass filters
 #define P_LPF0 5
 #define P_LPF1 6
@@ -48,6 +45,7 @@ If TINYRFTOOL is defined, the definition for the analog pins change.
 #define P_SIDETONE 7
 
 #define P_PTTIN 8
+#define P_RELAYIN 0
 #define P_PTTOUT 9
 
 #define P_BUTTON 10
@@ -95,8 +93,9 @@ If TINYRFTOOL is defined, the definition for the analog pins change.
 // active logic level right to left
 //                           Analog   Digital
 //                            76xx3210321098765432xx
-unsigned long PinSetLogic = 0b0000011010001011111100ul ;
-//                            AA..AooAoIIIoIoooooo..
+unsigned long PinSetLogic = 0b0000111010001011111100ul ;
+//                            AA..oooAoIIIoIoooooo..
+//unsigned long PinSetLogic=0b0000011010001011111100ul ;
 //#define PINSETLOGIC(p) ((PinSetLogic>>((unsigned long)p)) & 0xfffffffeul)
 #define PINSETLOGIC(p) (bitRead(PinSetLogic,p))
 class RadioPins : protected Taskable {
@@ -104,8 +103,9 @@ class RadioPins : protected Taskable {
   long maxTXtime=0 ;  /// qqqq not implemented
   int level ;
 public:
-  long hangTime=1600 ;
-  long timeRemaining ;
+  long hangTimer = 0 ;
+  long hangTime = 1600 ; // qqq put in eeprom!
+//  long timeRemaining ;
   PinSet () {
     init();
     setup(10); // this is used for CW hang time if not QSK  
@@ -123,7 +123,7 @@ public:
     Taskable:: setup (arg) ;
   }
   int restart() {
-    timeRemaining = hangTime ;
+    //timeRemaining = hangTime ;
     //setup(hangTime);
   }
 
@@ -132,8 +132,8 @@ public:
     if ( P_BUTTON) pinMode ( P_BUTTON, INPUT_PULLUP) ;
     if ( P_ENCODERA) pinMode ( P_ENCODERA, INPUT_PULLUP) ;
     if ( P_ENCODERB) pinMode ( P_ENCODERB, INPUT_PULLUP) ;
-//    if ( P_KEYERIN) pinMode ( P_KEYERIN, INPUT) ;
-    if ( P_KEYERIN) pinMode ( P_KEYERIN, INPUT) ; // qqq INPUT_PULLUP to test on bare Nano
+    if ( P_KEYERIN) pinMode ( P_KEYERIN, INPUT) ;
+//    if ( P_KEYERIN) pinMode ( P_KEYERIN, INPUT_PULLUP) ; // qqq INPUT_PULLUP to test on bare Nano
     if ( P_KEYERDOT) pinMode ( P_KEYERDOT, INPUT_PULLUP) ; 
     if ( P_KEYERDASH) pinMode ( P_KEYERDASH, INPUT_PULLUP) ; 
     if ( P_BPF0) pinMode (P_BPF0, OUTPUT);
@@ -146,6 +146,7 @@ public:
     if ( P_IFF0) pinMode (P_IFF0, OUTPUT);
     if ( P_IFF1) pinMode (P_IFF1, OUTPUT);
     if ( P_PTTIN) pinMode (P_PTTIN, INPUT_PULLUP );
+    if ( P_RELAYIN) pinMode (P_RELAYIN, INPUT_PULLUP );
     if ( P_PTTOUT) pinMode (P_PTTOUT, OUTPUT);
     if ( P_CWOUT) pinMode (P_CWOUT, OUTPUT);
     if ( P_LED0) pinMode (P_LED0, OUTPUT);
@@ -219,7 +220,9 @@ public:
     if (hangTime > 0 )
       setup(hangTime);
   }
+  // implement hang-time if PTT is actived during CW
   int loop ( int arg = 0) {
+#if 0
     if ( get(P_PTTIN ))  { // if user has PPT pushed, ignore CW hangtime
       //radio.pttIn(1); // radio is controlled in TinyGui
       timeRemaining = hangTime  ;
@@ -231,6 +234,18 @@ public:
       set(P_PTTOUT, 0) ;
       timeRemaining = 0 ;
     }
+#else
+    if ( get(P_PTTIN) ) {
+      set(P_PTTOUT,1) ;  
+      hangTimer = millis() ;    
+    } else if ( get(P_CWOUT) ){
+        set(P_PTTOUT,1) ;
+        hangTimer = millis() + hangTime;
+    } else if ( hangTimer && millis() > hangTimer ) {
+        set(P_PTTOUT,0) ;
+        hangTimer = 0 ;
+    }
+#endif
   }
 
 } radioPins ;

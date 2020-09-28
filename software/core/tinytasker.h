@@ -22,6 +22,7 @@
  * first task's loop() method is called again.
  * TinyTasker is extensively tested with time periods of 4 ms and larger.
  */
+#define byte unsigned char
 #ifndef MAXTASKS
 #define MAXTASKS 10
 #endif

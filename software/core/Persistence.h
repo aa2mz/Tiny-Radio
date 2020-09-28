@@ -294,7 +294,7 @@ char buffer[17]; // no strings are longer than 16 chars;
  */
 void dictionaryDefault(void)
 {
-//Serial.println("Dict default");
+Serial.println("Dict default");
   int i ;
   // 4 leading bytes, 
   Version = D_VERSION ;
@@ -476,6 +476,8 @@ class VFOAEEPROMTask : protected Taskable {
 //Serial.println(vfoA);
       if (vfoA != eeGet(D_VFOAFREQUENCY*4+DICT_OFFSET)) {
         eePut(D_VFOAFREQUENCY*4+DICT_OFFSET, vfoA);
+//Serial.println("VFO update");
+
       }
 //Serial.println(eeGet(D_VFOAFREQUENCY*4+DICT_OFFSET));
 

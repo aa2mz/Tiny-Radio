@@ -87,12 +87,13 @@ const unsigned int cwPUNCT[] PROGMEM = {
   0b11010101011,      // equal =
   0b10110101101,      // plus + AR1011010101
   0b1101010101011,    // minus - 
-  0b11010110110101,   // under _ Not recommended
+//  0b11010110110101,   // under _ Not recommended
+  0b011011011011,   // double M (under "_") -  Not recommended
   0b1011010101101,    // Quote " 
   0b110101011010101,  // dollar $ Not recommended
   0b10110101101101,   // at @
   0b1101011010101,    // end of work SK ^K
-  0b101010101010101,  // error BS ^H
+  0b010101010101,  // error BS ^H
   0b110101101011,     // start KA ^A
   0b1011010101        // understood SN ^N
 } ;

@@ -12,6 +12,13 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+#ifdef KEYERGUI
+#include "KeyCmdr.h"
+#endif
+#define KeyerDoCW 0
+#define KeyerDoPractice 1
+#define KeyerDoNothing 2
+#define KeyerDoTX 4
 
 #define KSneedREAD 16
 #define KSidle (0 | KSneedREAD)
@@ -108,7 +115,8 @@ public:
         keyRead |= (analogReverse?KEYdot:KEYdash) ;  
       }
 #if 1
-if ( l < 1000 && getDictionary(D_CWAKEYDOT) > getDictionary(D_CWAKEYDASH)  ) {
+if ( l < 1000 && getDictionary(D_CWAKEYDOT) > getDictionary(D_CWAKEYDASH)  ) 
+{
 Serial.print(l) ;
 Serial.print(" ");
 Serial.println(keyRead,BIN); 
@@ -133,9 +141,9 @@ class Keyer : public Taskable {
   int farnsworthMS = 92 ;
   int farnsworthExtra = 1020 ;
   int weightMS = 0 ;
-  int practice = 0 ;
+  int keyerDoes = 0 ;
     
-  int keying ;
+  int guiSound ;
   int pinDot, pinDash;
   int keyOUT = P_CWOUT ;
   int keyerStyle ;
@@ -144,7 +152,13 @@ class Keyer : public Taskable {
 
   unsigned int elementHistory ;
 //  CATRadio * keyCmdr;
-
+  int push( unsigned int c ) {
+#ifdef KEYERGUI
+    if ( keyCmdr )  {
+      keyCmdr->push(c,guiSound) ;
+    }
+#endif
+  }
   int element() { // only Farnsworth timing if sending text2CW
 #ifdef TEXT2CW
     if (text2CW.busy())
@@ -171,7 +185,7 @@ class Keyer : public Taskable {
     return codeKey.read();
   }
   int setCW (int on) {
-    if ( !practice) radioPins.set(P_CWOUT,on);
+    if ( !guiSound && !(keyerDoes & KeyerDoPractice) ) radioPins.set(P_CWOUT,on);
     if (sideTone > 0 ) {
       if (on)
         tone(sideTonePin,sideTone);
@@ -200,7 +214,7 @@ public:
   
   Keyer () {
     state = KSidle ;
-    keying = 0 ;
+    guiSound = 0 ;
     setup(10); // timing is provided by parent class
   }
   int setPins( int outpin, int dit, int dah = 0 , int rev = 0 ) {
@@ -225,6 +239,7 @@ public:
     keyerStyle = ks ;
   }
   int setWPM(int wordRate, int charRate = 0 ){ // word rate, character rate
+    int oldWpm = wpm ;
     wpm = wordRate ;
     if ( charRate < wordRate )
       charRate = wordRate ;
@@ -234,20 +249,25 @@ public:
     // overall words per minute is exact.
     long spareMS = ((charRate - wordRate) *50L) * elementMS ; // to spread out
     farnsworthExtra = spareMS / (6*wpm)  ;
+    return oldWpm ;
   }
   int setWeight(int w = 0 ){ // adjust for preference or QSK operation 
     weightMS = 0 ;
   }
 
 #ifdef TEXT2CW
-  int send ( char * s) {
-    keying = 1;
+  int send ( char * s, int guiSound = 0 ) {
+    this->guiSound = guiSound;
     text2CW.setup(s) ;
   }
 #endif
-  int practiceMode(int p) {
-    int priorMode = practice ;
-    practice = p;
+  keyerDo (int p) {
+    int priorMode = keyerDoes ;
+    if ( p <= 0 )        // clear bits
+      keyerDoes &= p;
+    else                // set bits
+      keyerDoes |= p;
+
     return priorMode ;
   }
   
@@ -255,7 +275,12 @@ public:
 #ifdef TEXT2CW
     if (text2CW.busy())
       return textLoop();
+    else
+      guiSound = 0 ;
 #endif
+    if ( keyerDoes & KeyerDoNothing)
+      return ;
+      
     if (keyerStyle == KEYERpaddle)
       return paddleLoop ();
     if (keyerStyle == KEYERstraighter)
@@ -290,21 +315,21 @@ private:
         k = KEYup;
         break;
       case KEYchar:
-        if (keyCmdr) keyCmdr->push(elementHistory) ;
+        push(elementHistory) ;
         setup( element()*3+farnsworth());
         elementHistory = 0 ;
         needRead = 1 ;
         break ;
       case KEYword:
         setCW(0);
-        if (keyCmdr) keyCmdr->push(0);
+        push(0);
         elementHistory = 0 ;
         setup( element()*7+2*farnsworth());
         needRead = 1 ;
         break ;
       case KEYnone: // not here!!!
         setCW(0);
-        if (keyCmdr) keyCmdr->push(0);
+        push(0);
         elementHistory = 0 ;
         return;
     }
@@ -366,7 +391,7 @@ static int firstIdle ;
         } else {  // stay idle
           state = KSidle ;
           if (firstIdle == 1 ) {
-            if (keyCmdr) keyCmdr->push(elementHistory) ; // send a space to end the word
+            push(elementHistory) ; // send a space to end the word
             elementHistory = 0 ; // start new word
             firstIdle = 0 ;
           }
@@ -376,18 +401,18 @@ static int firstIdle ;
       case KScharWAIT :
         if (k == KEYnone ) { // wait for a new word
           // call the character handler
-          if (keyCmdr) keyCmdr->push(elementHistory) ; // decode the first char in a word
+          push(elementHistory) ; // decode the first char in a word
           elementHistory = 0 ; 
           state = KSidle ;
           setup(element()*4+farnsworth()) ; // have alread waited 3 of 7 elementMSs
           return;
         } else if ( k & KEYdash ) {   // priority to dash so N's and C's start before A's
-          if (keyCmdr) keyCmdr->push(elementHistory) ; // start a second or later char in the same word
+          push(elementHistory) ; // start a second or later char in the same word
           elementHistory = 0 ; 
           dashON();
           return ;
         } else if ( k & KEYdot ) {
-          if (keyCmdr) keyCmdr->push(elementHistory) ; // start a second or later char in the same word
+          push(elementHistory) ; // start a second or later char in the same word
           elementHistory = 0 ; 
           dotON() ;
           return ;
