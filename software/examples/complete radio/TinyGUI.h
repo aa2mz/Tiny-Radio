@@ -38,9 +38,8 @@ public:
   int getStep(void );
   int loop (int arg = 0 ) ;
   int txStatus(int arg = 0){
-  #if 0
     if ( radio->getPtt()) {
-      oled.writeChar(3,7,'m', COLORWB,SIZE2);
+      oled.writeChar(3,7,'r', COLORWB,SIZE2);
       oled.writeChar(3,9,'1', COLORWB,SIZE2);
       oled.writeChar(3,11,'1', COLORWB,SIZE1);
       oled.writeChar(3,12,'2', COLORWB,SIZE1);
@@ -50,11 +49,6 @@ public:
       oled.writeChar(3,11,'4', COLORWB,SIZE1);
       oled.writeChar(3,12,'0', COLORWB,SIZE1);
     }
- #endif
-    if ( radio->getPtt()) 
-      oled.writeMixedSize(3,7,pgm2string(S_TX)) ;
-    else
-      oled.writeMixedSize(3,7,pgm2string(S_RX)) ;
   }
 private:
 #include "doers.h"
@@ -107,12 +101,13 @@ int TinyGui :: loop (int arg=0 ) {
   static int toggle;
   // do radio things here, GUI things in doerloop()
   int pttin = radioPins.get( P_PTTIN ) ;
+digitalWrite(P_LED0, pttin);
   // qqq how do we keep this from overriding CAT ptt-in? make them separate methods?!
   //radioPins.set(P_LED0, pttin);
-  if ( pttin != toggle ) {
-    radio->pttCmd(pttin);
-    toggle = pttin;
-  }
+//  if ( pttin != toggle ) {
+//    radio->pttCmd(pttin);
+//    toggle = pttin;
+//  }
   doerLoop();
     
 }
