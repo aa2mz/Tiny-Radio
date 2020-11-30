@@ -1,64 +1,28 @@
 ## Purpose
-This document will explain why the display of the frequency value changes when you switch to CW mode.
-It will start with an explantion of how the actual dial (or logged) frequency is determined for AM and SSB modes.
+This document will explain why the frequency displayed changes value when you switch to CW mode.
+It brief explana how the dial (or logged) frequency is determined for AM and SSB modes.
 Then it explain how the case of CW mode is a little bit different. 
-While the software takes care of the frequency display for you, 
-an explanation of the behavior changing between CW modes and sideband modes is given.
+The software takes care of the frequency display for you, 
+and it makes adjustments for you when changing between voice and CW modes.
+
 ## Dial Frequency
 Convention is that the "frequency" of a transimision is that of it's carrier or, 
-in the case of emissions with suprressed carriers,
-the frequency that the carrier would have if it were present.
+in the case of emissions with suprressed carriers like LSB, USB and DSB,
+the frequency that the carrier would have been on if it were present.
 That is the frequency that is displayed on the tuning dial.
 
-#### AM mode is prehaps the easiest to undestand.
-The radio dial will show the frequency as you tune AM carrier. 
-When the carrier is prefectly tuned, you will not hear it.
-That's called "zero beating" the carrier because you can't hear "zero hertz".
-When the carrier is zero-beated, that is the frequency of AM station and
-that is what is shown on the tuning dial or display.
-What you hear are the upper and lower sidebands that contain the modulation
-of the AM emission.
-
-#### Single sideband tuning.
-Don't touch that dial!
-When tuned to an AM station in AM mode, you can change mode on your receiver
-and you will hear the same in LSB and USB modes.** 
-The frequency displayed, called the "dial frequency" will not change
-because the carrier frequency is the same for both the 
-upper an lower sidebands... 
-even if the carrier weren't there as in pure sideband transmissions.
-
-(**Nitpicking: It will likely sound a little bit different because your 
-IF filters control the bandwith of the signal and the slope on the
-upper and lower sides of filter may not be the same. 
-So while the *volume* of the sounds might differ, the pitch aka *frequency,*
-of the voices and music in both LSB and USB will remain the same 
-and it's "frequecy" that were concerned with here.)
-
-It should be clear now that when making a "real" single sideband transmission
-that the dial frequency is higher than the modulation in an LSB transmission
-and that the dial frequency is lower than the modulation in a USB transmision.
-
-It all works out though because all radios adhere to the same definition of "dial frequency"
-and if you say meet me on 7.180 LSB or 14.320 USB all (properly working) transceivers will
-tune to the same frequency.
-
-#### Summary
-The frequency of AM, LSB, LSB and DSB emissons are "defined" as the frequency of their carrier frequencies
-even if they don't actually have a carrier. 
-That's the way it is an that's the number that TinyRadio software will report on the screen and serial port.
-
 ## What about CW?
-The "dial frequency" of CW is defined as that of the actual emission.
-At issue is that if you tune to the emission frequency (zero beat it) you won't hear anything!
-The zero-beat frequency is the "official" frequency of the signal and that is what you would log.
-However, tou will need to tune slightly way, typically 600 to 800 Hz higher to hear the signal...
-and then tune back to the zero-beat frequency to send, then re-tune to receive... ughh!
+The "dial frequency" of CW is defined as that of the carrier
+and that is the frequency that you would log.
+But you can't receive at that frequency; the signal would be "zero-beated" and you wouldn't hear anything!
+
+To receive, you radio needs to tune slightly way, typically 400 to 800 Hz higher, to hear the signal
+and then to transmit, it needs to tune back to the original carrier frequenc so that the other operator can hear you.
 
 *This is "convention" rather than "definition:*
-TinyRadio software and many modern radios take care of this for you. 
-You set the sidetone frequency that you like to hear receiving CW
-and then the radio offsets the display frequency in recieve mode
+TinyRadio software and many modern transceivers take care of this for you. 
+You set the sidetone frequency that you like to hear when receiving CW
+and then the radio automatically offsets the tuning in recieve mode.
 (without changing the number on the dial) and then restores it in transmit mode automatically.
 Imortantly: the dial frequency does not change.
 The dial or display shows the frequency that you would transmit on when you key down,
