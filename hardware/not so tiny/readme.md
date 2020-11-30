@@ -27,6 +27,7 @@ Out 10 bit A2D converter doesn't have enough resolution.
 Let's set is up so that S9+20 = 4 volts then dividing .5 mV by 1000 , 
 the A2D converter should start responding at about S2... good enough for even quiet bands.
 A band with S5 noise should be well withing resolution of the A2D converter.
+In the end, I fiddled with the formuala in trStatus() in TinyGui.h until it felt right.
 ```
 S9 + 40 dB	5.0 mV
 S9 + 30 dB	1.6 mV
@@ -105,7 +106,10 @@ The next rev should include addional circuitry to switch the relays.
 
 ![schema](https://github.com/aa2mz/Tiny-Radio/blob/master/hardware/not%20so%20tiny/Sheet_2.png)
 
-Notes page 1 - Electret mic input probably doesn't need an amplfier prior to use by an IC mixer. 
+Notes page 2 - There's a note in the upper left of page 2 suggesting a DC block in the Line-In signal but then I omitted the capacitor. 
+I soldered a lead from a 100nF cap to one of the leads of ISR1 (39K resistor) 
+and inserted the outer leads of the pair into the pads for ISR1 to acheive the effect.
+Electret mic input probably doesn't need an amplfier prior to use by an IC mixer. 
 I used a 1.5K resistor as ISR2 to get a nice line level out.
 
 But the ne602/sa612 requires that the input be in the micro volt range. Adjust the values of ISR1 and ISR2 to get the voltage levels of the line-in and microphone down to at most  63 millivolts PP at 50 ohms or 350mV PP at 1500 ohms for use by an ne602/sa612.
